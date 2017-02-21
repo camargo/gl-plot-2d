@@ -1,0 +1,39 @@
+{
+  "name": "gl-plot-2d",
+  "version": "1.0.0",
+  "description": "A Web Component for gl-plot2d.",
+  "main": "index.tsx",
+  "scripts": {
+    "build:dev": "webpack-dev-server --inline --progress --port 8080",
+    "build:prod": "webpack"
+  },
+  "author": "Chris Camargo",
+  "dependencies": {
+    "canvas-fit": "1.5.0",
+    "gauss-random": "1.0.1",
+    "gl-line2d": "1.4.1",
+    "gl-plot2d": "1.2.0",
+    "gl-scatter2d": "1.2.2",
+    "gl-select-box": "1.0.1",
+    "gl-spikes2d": "1.0.1",
+    "glslify": "6.0.1",
+    "mouse-change": "1.4.0",
+    "mouse-wheel": "1.2.0",
+    "skatejs": "4.6.7",
+    "skatejs-web-components": "5.2.0",
+    "tslib": "1.5.0"
+  },
+  "devDependencies": {
+    "html-webpack-plugin": "2.28.0",
+    "ify-loader": "1.0.3",
+    "ts-loader": "2.0.0",
+    "typescript": "2.1.6",
+    "webpack": "2.2.1",
+    "webpack-dev-server": "2.4.1"
+  },
+  "browserify": {
+    "transform": [
+      "glslify"
+    ]
+  }
+}

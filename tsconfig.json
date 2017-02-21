@@ -1,0 +1,30 @@
+{
+	"compilerOptions": {
+		"module": "commonjs",
+		"target": "es5",
+		"lib": [
+			"es2016",
+			"dom"
+		],
+		"typeRoots": [
+			"./@types"
+		],
+		"types": [
+			"whatwg-customelements"
+		],
+		"jsx": "react",
+		"jsxFactory": "skate.h",
+		"noImplicitAny": false,
+		"strictNullChecks": true,
+		"sourceMap": true,
+		"forceConsistentCasingInFileNames": true,
+		"importHelpers": true,
+		"newLine": "LF"
+	},
+	"include": [
+		"index.tsx"
+	],
+  "exclude": [
+		"node_modules"
+	]
+}

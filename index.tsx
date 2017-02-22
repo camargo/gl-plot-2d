@@ -69,6 +69,13 @@ interface GlPlot2dProps {
   zeroLineWidth: number[];
 }
 
+/**
+ * GlPlot2dComponent class.
+ *
+ * @export
+ * @class GlPlot2dComponent
+ * @extends {skate.Component<GlPlot2dProps>}
+ */
 export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
   private gl: WebGLRenderingContext | null;
   private canvas: HTMLCanvasElement | null;
@@ -309,7 +316,7 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
   }
 
   /**
-   * Helper function that make dummy ticks.
+   * Helper function that makes dummy ticks.
    *
    * @param {number} lo
    * @param {number} hi

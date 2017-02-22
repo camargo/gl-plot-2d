@@ -16,6 +16,7 @@ interface GlPlot2dProps {
   // General.
   plotType: string;
   pointCount: number;
+  // pointPositions: Float32Array; TODO.
   pixelRatio: number;
   screenBox: number[] | null;
   dataBox: number[] | null;
@@ -29,6 +30,8 @@ interface GlPlot2dProps {
   // For scatter plots.
   scatterSize: number;
   scatterColor: number[];
+  scatterBorderSize: number;
+  scatterBorderColor: number[];
 
   // Title.
   titleEnable: boolean;
@@ -116,6 +119,8 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
       // For scatter plots.
       scatterSize: skate.prop.number({ attribute: true }),
       scatterColor: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
+      scatterBorderSize: skate.prop.number({ attribute: true }),
+      scatterBorderColor: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
 
       // Title.
       titleEnable: skate.prop.boolean({ attribute: true }),
@@ -322,7 +327,9 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
       let scatter = createScatter(this.plot, {
         positions: this['pointPositions'] ? this['pointPositions'] : this.makePositions(),
         size: this['scatterSize'],
-        color: this['scatterColor']
+        color: this['scatterColor'],
+        borderSize: this['scatterBorderSize'],
+        borderColor: this['scatterBorderColor']
       });
     }
 

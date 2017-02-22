@@ -16,7 +16,7 @@ interface GlPlot2dProps {
   // General.
   plotType: string;
   pointCount: number;
-  // pointPositions: Float32Array; TODO.
+  pointPositions: Float32Array;
   pixelRatio: number;
   screenBox: number[] | null;
   dataBox: number[] | null;
@@ -106,6 +106,7 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
       // General.
       plotType: skate.prop.string({ attribute: true }),
       pointCount: skate.prop.number({ attribute: true }),
+      pointPositions: skate.prop.object<GlPlot2dComponent, Float32Array>({ attribute: true }),
       pixelRatio: skate.prop.number({ attribute: true }),
       screenBox: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
       dataBox: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
@@ -198,9 +199,27 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
    * @memberOf GlPlot2dComponent
    */
   renderCallback(props?: GlPlot2dProps) {
-    return (
-      <canvas />
-    );
+    return ([
+      <style>
+      {`
+        div {
+          width: 100%;
+          height: 300px
+        }
+
+        canvas {
+          position: absolute;
+          bottom: 0px;
+          top: 0px;
+          left: 0px;
+          right: 0px;
+        }
+      `}
+      </style>,
+      <div>
+        <canvas />
+      </div>
+    ]);
   }
 
   /**
@@ -211,6 +230,7 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
   renderedCallback(): void {
     if (this.shadowRoot && !this.canvas) {
       this.canvas = this.shadowRoot.querySelector('canvas');
+      this.initResize();
       this.initAndDrawPlot();
     }
   }
@@ -238,6 +258,30 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
   }
 
   /**
+   * Helper function that initializes resize canvas logic.
+   *
+   * @memberOf GlPlot2dComponent
+   */
+  initResize(): void {
+    // Setup fit().
+    let resize = fit(this.canvas);
+    resize.scale = window.devicePixelRatio || 1;
+
+    if (this.shadowRoot) {
+      resize.parent = this.shadowRoot.querySelector('div');
+    }
+
+    // Resize after setting up fit().
+    resize();
+
+    // Setup resize event listener.
+    window.addEventListener('resize', () => {
+      resize();
+      this.initAndDrawPlot();
+    }, false);
+  }
+
+  /**
    * Helper function that initializes and draws a plot.
    *
    * @returns {void}
@@ -245,8 +289,6 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
    * @memberOf GlPlot2dComponent
    */
   initAndDrawPlot(): void {
-    fit(this.canvas, window, +window.devicePixelRatio);
-
     if (this.canvas) {
       this.gl = this.canvas.getContext('webgl');
     }
@@ -291,7 +333,7 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
       labelFont:        this['labelFont'],
       labelColor:       this['labelColor'],
 
-      ticks:            this['ticks'].length > 0 ? this['ticks'] : [ this.makeTicks(-20, 20), this.makeTicks(-20, 20)],
+      ticks:            this['ticks'].length > 0 ? this['ticks'] : [ this.makeTicks(-20, 20), this.makeTicks(-10, 10)],
       tickEnable:       this['tickEnable'],
       tickPad:          this['tickPad'],
       tickAngle:        this['tickAngle'],
@@ -314,7 +356,7 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
     // Line plot.
     if (this['plotType'] === 'line') {
       let line = createLine(this.plot, {
-        positions: this['pointPositions'] ? this['pointPositions'] : this.makePositions(),
+        positions: this['pointPositions'].length > 0 ? this['pointPositions'] : this.makePositions(),
         fill: this['lineFill'],
         fillColor: this['lineFillColor'],
         width: this['lineWidth']
@@ -325,7 +367,7 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
     // Scatter plot.
     else if (this['plotType'] === 'scatter') {
       let scatter = createScatter(this.plot, {
-        positions: this['pointPositions'] ? this['pointPositions'] : this.makePositions(),
+        positions: this['pointPositions'].length > 0 ? this['pointPositions'] : this.makePositions(),
         size: this['scatterSize'],
         color: this['scatterColor'],
         borderSize: this['scatterBorderSize'],
@@ -368,7 +410,7 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
     let positions = new Float32Array(2 * this['pointCount'])
 
     for (let i = 0; i < 2 * this['pointCount']; i += 2) {
-      positions[i]   = (i / this['pointCount']) * 20.0 - 20.0;
+      positions[i]   = (i / this['pointCount']) * 9.9 - 9.9;
       positions[i+1] = gaussRandom();
     }
 

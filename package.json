@@ -20,15 +20,15 @@
     "mouse-change": "1.4.0",
     "mouse-wheel": "1.2.0",
     "skatejs": "4.6.7",
-    "skatejs-web-components": "5.2.0",
+    "skatejs-web-components": "5.2.1",
     "tslib": "1.6.0",
     "underscore": "1.8.3"
   },
   "devDependencies": {
     "html-webpack-plugin": "2.28.0",
     "ify-loader": "1.0.3",
-    "ts-loader": "2.0.0",
-    "typescript": "2.1.6",
+    "ts-loader": "2.0.1",
+    "typescript": "2.2.1",
     "webpack": "2.2.1",
     "webpack-dev-server": "2.4.1"
   },

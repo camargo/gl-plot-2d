@@ -7,8 +7,7 @@ This is a Web Component that wraps [gl-plot2d](https://github.com/gl-vis/gl-plot
 ## Build
 
 ```
-npm i yarn -g
-yarn install
+npm install
 npm run build:dev
 ```
 

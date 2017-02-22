@@ -21,4 +21,4 @@ These were calculated by taking the average of 20 individual draw calls.
 | Chrome (56.0.2924.87)         | 4.208ms       | 4.399ms        | 4.460ms          |
 | Firefox (51.0.1)              | 5.006ms       | 5.573ms        | 7.272ms          |
 
-For info [here](https://docs.google.com/spreadsheets/d/1DDMUAgubN-3iSdNFhZZJbHULuGKRHWXufoiW4uKe6s8/edit?usp=sharing).
+More info [here](https://docs.google.com/spreadsheets/d/1DDMUAgubN-3iSdNFhZZJbHULuGKRHWXufoiW4uKe6s8/edit?usp=sharing).

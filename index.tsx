@@ -13,13 +13,22 @@ interface Tick {
 }
 
 interface GlPlot2dProps {
-  // Misc.
+  // General.
   plotType: string;
   pointCount: number;
   pixelRatio: number;
   screenBox: number[] | null;
   dataBox: number[] | null;
   viewBox: number[] | null;
+
+  // For line plots.
+  lineFill: boolean[];
+  lineFillColor: number[][];
+  lineWidth: number;
+
+  // For scatter plots.
+  scatterSize: number;
+  scatterColor: number[];
 
   // Title.
   titleEnable: boolean;
@@ -91,13 +100,22 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
    */
   static get props(): skate.ComponentProps<GlPlot2dComponent, GlPlot2dProps> {
     return {
-      // Misc.
+      // General.
       plotType: skate.prop.string({ attribute: true }),
       pointCount: skate.prop.number({ attribute: true }),
       pixelRatio: skate.prop.number({ attribute: true }),
       screenBox: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
       dataBox: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
       viewBox:skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
+
+      // For line plots.
+      lineFill: skate.prop.array<GlPlot2dComponent, boolean>({ attribute: true }),
+      lineFillColor: skate.prop.array<GlPlot2dComponent, number[]>({ attribute: true }),
+      lineWidth: skate.prop.number({ attribute: true }),
+
+      // For scatter plots.
+      scatterSize: skate.prop.number({ attribute: true }),
+      scatterColor: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
 
       // Title.
       titleEnable: skate.prop.boolean({ attribute: true }),
@@ -288,25 +306,23 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
 
     this.plot = createPlot(options);
 
+    // Line plot.
     if (this['plotType'] === 'line') {
       let line = createLine(this.plot, {
-        positions: this.makePositions(),
-        fill: [false, false, false, false],
-        fillColor: [
-          [0,0,1,0.5],
-          [0,0,1,0.5],
-          [0,0,1,0.5],
-          [0,0,1,0.5]],
-        width: 1
-      })
+        positions: this['pointPositions'] ? this['pointPositions'] : this.makePositions(),
+        fill: this['lineFill'],
+        fillColor: this['lineFillColor'],
+        width: this['lineWidth']
+      });
 
       this.plot.addObject(line);
     }
+    // Scatter plot.
     else if (this['plotType'] === 'scatter') {
       let scatter = createScatter(this.plot, {
-        positions: this.makePositions(),
-        size: 7,
-        color: [0.3, 0.5, 0.8, 1]
+        positions: this['pointPositions'] ? this['pointPositions'] : this.makePositions(),
+        size: this['scatterSize'],
+        color: this['scatterColor']
       });
     }
 

@@ -1,6 +1,7 @@
 import 'skatejs-web-components';
 import * as skate from 'skatejs';
 
+import { debounce } from 'underscore';
 import * as fit from 'canvas-fit';
 import * as gaussRandom from 'gauss-random';
 import * as createScatter from 'gl-scatter2d';
@@ -21,6 +22,7 @@ interface GlPlot2dProps {
   screenBox: number[] | null;
   dataBox: number[] | null;
   viewBox: number[] | null;
+  debug: boolean;
 
   // For line plots.
   lineFill: boolean[];
@@ -89,9 +91,9 @@ interface GlPlot2dProps {
  * @extends {skate.Component<GlPlot2dProps>}
  */
 export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
-  private gl: WebGLRenderingContext | null;
-  private canvas: HTMLCanvasElement | null;
-  private plot: any;
+  private gl: WebGLRenderingContext | null; // WebGL Context.
+  private canvas: HTMLCanvasElement | null; // Canvas element we render to.
+  private plot: any;                        // Plot object via gl-plot2d.
 
   /**
    * Custom properties that should be defined on the element. These are set up in the constructor.
@@ -111,6 +113,7 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
       screenBox: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
       dataBox: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
       viewBox:skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
+      debug: skate.prop.boolean({ attribute: true }),
 
       // For line plots.
       lineFill: skate.prop.array<GlPlot2dComponent, boolean>({ attribute: true }),
@@ -274,11 +277,14 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
     // Resize after setting up fit().
     resize();
 
-    // Setup resize event listener.
-    window.addEventListener('resize', () => {
+    // Debounce the resize call.
+    let debounceResize = debounce(() => {
       resize();
       this.initAndDrawPlot();
-    }, false);
+    }, 200);
+
+    // Setup resize event listener.
+    window.addEventListener('resize', debounceResize, false);
   }
 
   /**
@@ -293,14 +299,21 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
       this.gl = this.canvas.getContext('webgl');
     }
     else {
-      console.error('GlPlot2dComponent: initPlot: No canvas: ', this.canvas);
+      if (this['debug']) {
+        console.error('GlPlot2dComponent: initAndDrawPlot: No canvas: ', this.canvas);
+      }
       return;
     }
 
     if (!this.gl) {
-      console.error('GlPlot2dComponent: initPlot: No gl: ', this.gl);
+      if (this['debug']) {
+        console.error('GlPlot2dComponent: initAndDrawPlot: No gl: ', this.gl);
+      }
       return;
     }
+
+    let aspect = this.gl.drawingBufferWidth / this.gl.drawingBufferHeight;
+    let dataBox = [-20, -20 / aspect, 20, 20 / aspect];
 
     let options = {
       gl:               this.gl,
@@ -308,7 +321,7 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
       pixelRatio:       this['pixelRatio'],
       screenBox:        this['screenBox'].length > 0 ? this['screenBox'] : null,
       viewBox:          this['viewBox'].length > 0 ? this['viewBox'] : null,
-      dataBox:          this['dataBox'].length > 0 ? this['dataBox'] : null,
+      dataBox:          this['dataBox'].length > 0 ? this['dataBox'] : dataBox,
 
       titleEnable:      this['titleEnable'],
       title:            this['title'],
@@ -333,7 +346,7 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
       labelFont:        this['labelFont'],
       labelColor:       this['labelColor'],
 
-      ticks:            this['ticks'].length > 0 ? this['ticks'] : [ this.makeTicks(-20, 20), this.makeTicks(-10, 10)],
+      ticks:            this['ticks'].length > 0 ? this['ticks'] : [ this.makeTicks(-20, 20), this.makeTicks(-20, 20)],
       tickEnable:       this['tickEnable'],
       tickPad:          this['tickPad'],
       tickAngle:        this['tickAngle'],
@@ -375,9 +388,15 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
       });
     }
 
-    console.time('drawTime');
+    if (this['debug']) {
+      console.time('drawTime');
+    }
+
     this.plot.draw();
-    console.timeEnd('drawTime');
+
+    if (this['debug']) {
+      console.timeEnd('drawTime');
+    }
   }
 
   /**
@@ -410,7 +429,7 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
     let positions = new Float32Array(2 * this['pointCount'])
 
     for (let i = 0; i < 2 * this['pointCount']; i += 2) {
-      positions[i]   = (i / this['pointCount']) * 9.9 - 9.9;
+      positions[i]   = (i / this['pointCount']) * 20 - 20;
       positions[i+1] = gaussRandom();
     }
 

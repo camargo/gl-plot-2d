@@ -12,7 +12,7 @@ yarn install
 npm run build:dev
 ```
 
-## Average Draw Times (ms)
+## Average Draw Times
 
 These were calculated by taking the average of 20 individual draw calls.
 

@@ -18,12 +18,12 @@
     "gl-select-box": "1.0.1",
     "gl-spikes2d": "1.0.1",
     "glslify": "6.0.1",
+    "lodash": "4.17.4",
     "mouse-change": "1.4.0",
     "mouse-wheel": "1.2.0",
     "skatejs": "4.6.7",
     "skatejs-web-components": "5.2.1",
-    "tslib": "1.6.0",
-    "underscore": "1.8.3"
+    "tslib": "1.6.0"
   },
   "devDependencies": {
     "html-webpack-plugin": "2.28.0",

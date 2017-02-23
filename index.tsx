@@ -1,7 +1,7 @@
 import 'skatejs-web-components';
 import * as skate from 'skatejs';
 
-import { debounce } from 'underscore';
+import { debounce } from 'lodash';
 import * as fit from 'canvas-fit';
 import * as gaussRandom from 'gauss-random';
 import * as createScatter from 'gl-scatter2d';
@@ -338,8 +338,6 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
       fillColor: line.fillColor,
       width: line.width
     });
-
-    this.plot.addObject(linePlot);
   }
 
   /**
@@ -357,8 +355,6 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
       borderSize: scatter.borderSize,
       borderColor: scatter.borderColor
     });
-
-    this.plot.addObject(scatterPlot);
   }
 
   /**

@@ -5,83 +5,11 @@ import { debounce } from 'underscore';
 import * as fit from 'canvas-fit';
 import * as gaussRandom from 'gauss-random';
 import * as createScatter from 'gl-scatter2d';
+import * as createScatterFancy from 'gl-scatter2d-fancy';
 import * as createLine from 'gl-line2d';
 import * as createPlot from 'gl-plot2d';
 
-interface Tick {
-  x: number;
-  text: string;
-}
-
-interface GlPlot2dProps {
-  // General.
-  plotType: string;
-  pointCount: number;
-  pointPositions: Float32Array;
-  pixelRatio: number;
-  screenBox: number[] | null;
-  dataBox: number[] | null;
-  viewBox: number[] | null;
-  debug: boolean;
-
-  // For line plots.
-  lineFill: boolean[];
-  lineFillColor: number[][];
-  lineWidth: number;
-
-  // For scatter plots.
-  scatterSize: number;
-  scatterColor: number[];
-  scatterBorderSize: number;
-  scatterBorderColor: number[];
-
-  // Title.
-  titleEnable: boolean;
-  title: string;
-  titleCenter: number[];
-  titleAngle: number;
-  titleColor: number[];
-  titleFont: string;
-  titleSize: number;
-
-  // Background color.
-  backgroundColor: number[];
-
-  // Border.
-  borderColor: number[];
-  borderLineEnable: boolean[];
-  borderLineWidth: number[];
-  borderLineColor: number[][];
-
-  // Labels.
-  labels: string[];
-  labelEnable: boolean[];
-  labelAngle: number[];
-  labelPad: number[];
-  labelSize: number[];
-  labelFont: string[];
-  labelColor: number[][];
-
-  // Ticks.
-  ticks: Tick[][];
-  tickEnable: boolean[];
-  tickPad: number[];
-  tickAngle: number[];
-  tickColor: number[][];
-  tickMarkWidth: number[];
-  tickMarkLength: number[];
-  tickMarkColor: number[][];
-
-  // Grid lines.
-  gridLineEnable: boolean[];
-  gridLineColor: number[][];
-  gridLineWidth: number[];
-
-  // Zero lines.
-  zeroLineEnable: boolean[];
-  zeroLineColor: number[][];
-  zeroLineWidth: number[];
-}
+import { GlPlot2dProps, Line, Scatter, Tick, Trace } from './lib';
 
 /**
  * GlPlot2dComponent class.
@@ -106,25 +34,18 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
   static get props(): skate.ComponentProps<GlPlot2dComponent, GlPlot2dProps> {
     return {
       // General.
-      plotType: skate.prop.string({ attribute: true }),
-      pointCount: skate.prop.number({ attribute: true }),
-      pointPositions: skate.prop.object<GlPlot2dComponent, Float32Array>({ attribute: true }),
+      data: skate.prop.array<GlPlot2dComponent, Trace>({
+        attribute: true,
+        coerce (traces) {
+          return traces.map(trace => new Trace(trace.mode, trace.positions, trace.positionCount, trace.line, trace.scatter));
+        }
+      }),
+
       pixelRatio: skate.prop.number({ attribute: true }),
       screenBox: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
       dataBox: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
       viewBox:skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
       debug: skate.prop.boolean({ attribute: true }),
-
-      // For line plots.
-      lineFill: skate.prop.array<GlPlot2dComponent, boolean>({ attribute: true }),
-      lineFillColor: skate.prop.array<GlPlot2dComponent, number[]>({ attribute: true }),
-      lineWidth: skate.prop.number({ attribute: true }),
-
-      // For scatter plots.
-      scatterSize: skate.prop.number({ attribute: true }),
-      scatterColor: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
-      scatterBorderSize: skate.prop.number({ attribute: true }),
-      scatterBorderColor: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
 
       // Title.
       titleEnable: skate.prop.boolean({ attribute: true }),
@@ -204,20 +125,7 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
   renderCallback(props?: GlPlot2dProps) {
     return ([
       <style>
-      {`
-        div {
-          width: 100%;
-          height: 300px
-        }
-
-        canvas {
-          position: absolute;
-          bottom: 0px;
-          top: 0px;
-          left: 0px;
-          right: 0px;
-        }
-      `}
+        {this.getStyles()}
       </style>,
       <div>
         <canvas />
@@ -258,6 +166,33 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
    */
   disconnectedCallback(): void {
     super.disconnectedCallback();
+  }
+
+  /**
+   * Helper that returns the styles for this component.
+   * TODO: Move this to a different file.
+   *
+   * @returns {string}
+   *
+   * @memberOf GlPlot2dComponent
+   */
+  getStyles(): string {
+    let styles = `
+      div {
+        width: 100%;
+        height: 300px
+      }
+
+      canvas {
+        position: absolute;
+        bottom: 0px;
+        top: 0px;
+        left: 0px;
+        right: 0px;
+      }
+    `;
+
+    return styles;
   }
 
   /**
@@ -366,27 +301,16 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
 
     this.plot = createPlot(options);
 
-    // Line plot.
-    if (this['plotType'] === 'line') {
-      let line = createLine(this.plot, {
-        positions: this['pointPositions'].length > 0 ? this['pointPositions'] : this.makePositions(),
-        fill: this['lineFill'],
-        fillColor: this['lineFillColor'],
-        width: this['lineWidth']
-      });
+    this['data'].forEach((trace: Trace) => {
+      trace.positions = this.makePositions(trace.positionCount);
 
-      this.plot.addObject(line);
-    }
-    // Scatter plot.
-    else if (this['plotType'] === 'scatter') {
-      let scatter = createScatter(this.plot, {
-        positions: this['pointPositions'].length > 0 ? this['pointPositions'] : this.makePositions(),
-        size: this['scatterSize'],
-        color: this['scatterColor'],
-        borderSize: this['scatterBorderSize'],
-        borderColor: this['scatterBorderColor']
-      });
-    }
+      if (trace.line instanceof Line) {
+        this.addLinePlot(trace.positions, trace.line);
+      }
+      else if (trace.scatter instanceof Scatter) {
+        this.addScatterPlot(trace.positions, trace.scatter);
+      }
+    });
 
     if (this['debug']) {
       console.time('drawTime');
@@ -397,6 +321,44 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
     if (this['debug']) {
       console.timeEnd('drawTime');
     }
+  }
+
+  /**
+   * Helper that adds a line plot to the current plot.
+   *
+   * @param {Float32Array} positions
+   * @param {Line} line
+   *
+   * @memberOf GlPlot2dComponent
+   */
+  addLinePlot(positions: Float32Array, line: Line): void {
+    const linePlot = createLine(this.plot, {
+      positions: positions,
+      fill: line.fill,
+      fillColor: line.fillColor,
+      width: line.width
+    });
+
+    this.plot.addObject(linePlot);
+  }
+
+  /**
+   * Helper that adds a scatter plot to the current plot.
+   *
+   * @param {Trace} trace
+   *
+   * @memberOf GlPlot2dComponent
+   */
+  addScatterPlot(positions: Float32Array, scatter: Scatter): void {
+    const scatterPlot = createScatter(this.plot, {
+      positions: positions,
+      size: scatter.size,
+      color: scatter.color,
+      borderSize: scatter.borderSize,
+      borderColor: scatter.borderColor
+    });
+
+    this.plot.addObject(scatterPlot);
   }
 
   /**
@@ -421,15 +383,16 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dProps> {
   /**
    * Helper function that makes dummy positions.
    *
+   * @param {number} pointCount
    * @returns {Float32Array}
    *
    * @memberOf GlPlot2dComponent
    */
-  makePositions(): Float32Array {
-    let positions = new Float32Array(2 * this['pointCount'])
+  makePositions(pointCount: number): Float32Array {
+    let positions = new Float32Array(2 * pointCount)
 
-    for (let i = 0; i < 2 * this['pointCount']; i += 2) {
-      positions[i]   = (i / this['pointCount']) * 20 - 20;
+    for (let i = 0; i < 2 * pointCount; i += 2) {
+      positions[i]   = (i / pointCount) * 20 - 20;
       positions[i+1] = gaussRandom();
     }
 

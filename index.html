@@ -6,21 +6,13 @@
   </head>
   <body>
     <gl-plot-2d
-      plot-type='line'
-      point-count='1000'
+      id="glPlot2d"
+      debug
+
       pixel-ratio='1'
       screen-box='[]'
       data-box='[]'
       view-box='[]'
-
-      line-fill='[false, true, false, false]'
-      line-fill-color='[[0, 0, 1, 0.5], [0, 0, 1, 0.5], [0, 0, 1, 0.5], [0, 0, 1, 0.5]]'
-      line-width='1'
-
-      scatter-size='5'
-      scatter-color='[0.3, 0.5, 0.8, 1]'
-      scatter-border-size='1'
-      scatter-border-color='[0, 0, 0, 1]'
 
       title='1000 Points'
       title-center='[190, 280]'
@@ -29,7 +21,7 @@
       title-font='sans-serif'
       title-size='24'
 
-      background-color='[1, 1, 1, 1]'
+      background-color='[0, 0, 0, 0]'
 
       border-color='[1, 1, 1, 1]'
       border-line-enable='[true, true, true, true]'
@@ -60,6 +52,35 @@
       zero-line-width='[3, 3]'
       zero-line-color='[[0, 0, 0, 0.5], [0, 0, 0, 0.5]]'>
     </gl-plot-2d>
+    <script>
+      let trace1 = {
+        mode: 'line',
+        positions: new Float32Array(),
+        positionCount: 1000,
+        line: {
+          fill: [false, true, false, false],
+          fillColor: [[0, 0, 1, 0.5], [0, 0, 1, 0.5], [0, 0, 1, 0.5], [0, 0, 1, 0.5]],
+          width: 1
+        }
+      };
+
+      let trace2 = {
+        mode: 'scatter',
+        positions: new Float32Array(),
+        positionCount: 100,
+        scatter: {
+          size: 10,
+          color: [0.0, 0.9, 0.0, 1],
+          borderSize: 1,
+          borderColor: [0, 0, 0, 1]
+        }
+      };
+
+      let data = JSON.stringify([trace1, trace2]);
+
+      let glPlot2d = document.getElementById('glPlot2d');
+      glPlot2d.setAttribute('data', data);
+    </script>
 
   </body>
 </html>

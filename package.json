@@ -14,7 +14,7 @@
     "gl-line2d": "1.4.1",
     "gl-plot2d": "1.2.0",
     "gl-scatter2d": "1.2.2",
-    "gl-scatter2d-fancy": "^1.2.1",
+    "gl-scatter2d-fancy": "1.2.1",
     "gl-select-box": "1.0.1",
     "gl-spikes2d": "1.0.1",
     "glslify": "6.0.1",

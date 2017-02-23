@@ -2,20 +2,28 @@
 import { Tick, Trace } from './';
 
 /**
- * GlPlot2dProps.
+ * GlPlot2dComponentProps.
+ *
+ * These are the properties for the gl-plot-2d web component.
+ *
+ * Note this is not the same as the options for gl-plot2d as the
+ * web component exposes more custom functionality.
  *
  * @export
- * @interface GlPlot2dProps
+ * @interface GlPlot2dComponentProps
  */
-export interface GlPlot2dProps {
-  // General.
-  data: Trace[];
+export interface GlPlot2dComponentProps {
+  // Custom.
+  traces: Trace[];
+  width: string;
+  height: string;
+  debug: boolean;
 
+  // General.
   pixelRatio: number;
   screenBox: number[] | null;
   dataBox: number[] | null;
   viewBox: number[] | null;
-  debug: boolean;
 
   // Title.
   titleEnable: boolean;

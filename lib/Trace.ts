@@ -4,6 +4,8 @@ import { Line, Scatter } from './';
 /**
  * Trace.
  *
+ * A trace represents the data being graphed.
+ *
  * @export
  * @class Trace
  */
@@ -19,6 +21,7 @@ export class Trace {
    *
    * @param {string} mode
    * @param {Float32Array} positions
+   * @param {positionCount} positionCount
    * @param {Line} line
    * @param {Scatter} scatter
    *
@@ -27,8 +30,8 @@ export class Trace {
   constructor(mode: string,
               positions: Float32Array,
               positionCount: number,
-              line ?: Line,
-              scatter ?: Scatter) {
+              line : Line,
+              scatter : Scatter) {
     this.mode = mode;
     this.positions = positions;
     this.positionCount = positionCount;

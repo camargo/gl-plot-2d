@@ -7,6 +7,8 @@
   <body>
     <gl-plot-2d
       id="glPlot2d"
+      width="100%"
+      height="300px"
       debug
 
       pixel-ratio='1'
@@ -76,10 +78,10 @@
         }
       };
 
-      let data = JSON.stringify([trace1, trace2]);
+      let traces = JSON.stringify([trace1, trace2]);
 
       let glPlot2d = document.getElementById('glPlot2d');
-      glPlot2d.setAttribute('data', data);
+      glPlot2d.setAttribute('traces', traces);
     </script>
 
   </body>

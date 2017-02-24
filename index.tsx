@@ -1,7 +1,7 @@
 import 'skatejs-web-components';
 import * as skate from 'skatejs';
 
-import { debounce, round } from 'lodash';
+import { debounce, first, last } from 'lodash';
 import * as d3Scale from 'd3-scale';
 import * as fit from 'canvas-fit';
 import * as createScatter from 'gl-scatter2d';
@@ -257,12 +257,8 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
       return;
     }
 
-    const extremes = this.findMinMax(this['traces']);
-    const dataBoxPad = 0.5;
-    const dataBox = [extremes.min.x - dataBoxPad, extremes.min.y - dataBoxPad, extremes.max.x + dataBoxPad, extremes.max.y + dataBoxPad];
-
-    const xTicks = this.makeLinearTicks(extremes.min.x, extremes.max.x, 5);
-    const yTicks = this.makeLinearTicks(extremes.min.y, extremes.max.y, 8);
+    let ticks = this.getTicks('linear');
+    const dataBox = [first(ticks.x).x - 0.25, first(ticks.y).x - 0.25, last(ticks.x).x + 0.25, last(ticks.y).x + 0.25];
 
     this.options = {
       gl:               this.gl,
@@ -295,7 +291,7 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
       labelFont:        this['labelFont'],
       labelColor:       this['labelColor'],
 
-      ticks:            this['ticks'].length > 0 ? this['ticks'] : [ xTicks, yTicks ],
+      ticks:            this['ticks'].length > 0 ? this['ticks'] : [ ticks.x, ticks.y ],
       tickEnable:       this['tickEnable'],
       tickPad:          this['tickPad'],
       tickAngle:        this['tickAngle'],
@@ -371,22 +367,74 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
   }
 
   /**
+   * Get ticks by type.
+   * TODO: Strong type.
+   *
+   * @param {string} type
+   * @returns {*}
+   *
+   * @memberOf GlPlot2dComponent
+   */
+  getTicks(type: string): any {
+    const extremes = this.findMinMax(this['traces']);
+
+    if (type === 'linear') {
+      return {
+        x: this.getLinearTicks(extremes.min.x, extremes.max.x),
+        y: this.getLinearTicks(extremes.min.y, extremes.max.y)
+      }
+    }
+    else if (type === 'log') {
+      return {
+        x: this.getLogTicks(extremes.min.x, extremes.max.x),
+        y: this.getLogTicks(extremes.min.y, extremes.max.y)
+      }
+    }
+    else {
+      return {
+        x: [],
+        y: []
+      };
+    }
+  }
+
+  /**
    * Helper function to make count linear tick marks on domain lo to hi.
    * Uses d3-scale to do so.
    * Coerces tick number[] to Tick[].
    *
    * @param {number} lo
    * @param {number} hi
-   * @param {number} count
-   * @returns {number[]}
+   * @returns {Tick[]}
    *
    * @memberOf GlPlot2dComponent
    */
-  makeLinearTicks(lo: number, hi: number, count: number): Tick[] {
+  getLinearTicks(lo: number, hi: number): Tick[] {
     const scale = d3Scale.scaleLinear()
-                         .domain([Math.floor(lo), Math.ceil(hi)]);
+                         .domain([Math.floor(lo), Math.ceil(hi)])
+                         .nice();
 
-    const ticks = scale.ticks(count);
+    const ticks = scale.ticks();
+
+    return ticks.map(tick => new Tick(tick));
+  }
+
+  /**
+   * Helper function to make count log tick marks on domain lo to hi.
+   * Uses d3-scale to do so.
+   * Coerces tick number[] to Tick[].
+   *
+   * @param {number} lo
+   * @param {number} hi
+   * @returns {Tick[]}
+   *
+   * @memberOf GlPlot2dComponent
+   */
+  getLogTicks(lo: number, hi: number): Tick[] {
+    const scale = d3Scale.scaleLog()
+                         .domain([Math.max(1, Math.floor(lo)), Math.ceil(hi)]);
+
+    const ticks = scale.ticks();
 
     return ticks.map(tick => new Tick(tick));
   }

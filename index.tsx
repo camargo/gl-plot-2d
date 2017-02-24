@@ -459,11 +459,11 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
     }
     else {
       traces.forEach((trace: Trace) => {
-          if (trace.min.x < min.x) { min.x = trace.min.x; }
-          if (trace.min.y < min.y) { min.y = trace.min.y; }
+        if (trace.min.x < min.x) { min.x = trace.min.x; }
+        if (trace.min.y < min.y) { min.y = trace.min.y; }
 
-          if (trace.max.x > max.x) { max.x = trace.max.x; }
-          if (trace.max.y > max.y) { max.y = trace.max.y; }
+        if (trace.max.x > max.x) { max.x = trace.max.x; }
+        if (trace.max.y > max.y) { max.y = trace.max.y; }
       });
     }
 

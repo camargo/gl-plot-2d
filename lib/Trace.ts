@@ -1,18 +1,19 @@
 
-import { Line, Scatter } from './';
+import { Line, Point, Scatter } from './';
 
 /**
  * Trace.
  *
- * A trace represents the data being graphed.
+ * A trace represents the data points being graphed.
  *
  * @export
  * @class Trace
  */
 export class Trace {
   public mode: string;
-  public positions: Float32Array;
-  public positionCount: number;
+  public positions: number[];
+  public min: Point;
+  public max: Point;
   public line: Line | null;
   public scatter: Scatter | null;
 
@@ -20,21 +21,24 @@ export class Trace {
    * Creates an instance of Trace.
    *
    * @param {string} mode
-   * @param {Float32Array} positions
-   * @param {positionCount} positionCount
+   * @param {number[]} positions
+   * @param {Point} min
+   * @param {Point} max
    * @param {Line} line
    * @param {Scatter} scatter
    *
    * @memberOf Trace
    */
   constructor(mode: string,
-              positions: Float32Array,
-              positionCount: number,
-              line : Line,
-              scatter : Scatter) {
+              positions: number[],
+              min: Point,
+              max: Point,
+              line: Line,
+              scatter: Scatter) {
     this.mode = mode;
     this.positions = positions;
-    this.positionCount = positionCount;
+    this.min = new Point(min.x, min.y);
+    this.max = new Point(max.x, max.y);
 
     if (line) {
       this.line = new Line(line.fill, line.fillColor, line.width);

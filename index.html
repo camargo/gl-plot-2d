@@ -48,19 +48,51 @@
 
       grid-line-enable='[true, true]'
       grid-line-color='[[0, 0, 0, 0.5], [0, 0, 0, 0.5]]'
-      grid-line-width='[1.0, 1.0]'
+      grid-line-width='[0.5, 0.5]'
 
       zero-line-enable='[false, false]'
       zero-line-width='[3, 3]'
       zero-line-color='[[0, 0, 0, 0.5], [0, 0, 0, 0.5]]'>
     </gl-plot-2d>
     <script>
+      // Helper that makes random positions for demo purposes.
+      function makePositions(count) {
+        let positions = [];
+        let minX = Number.MAX_SAFE_INTEGER;
+        let minY = Number.MAX_SAFE_INTEGER;
+        let maxX = Number.MIN_SAFE_INTEGER;
+        let maxY = Number.MIN_SAFE_INTEGER;
+
+        for (let i = 0; i < 2 * count; i += 2) {
+          positions[i]   = (i / count) * 20 - 20;
+          positions[i+1] = Math.sqrt(-2.0 * Math.log(Math.random())) * Math.cos(2.0 * Math.PI * Math.random());
+
+          if (positions[i] < minX) { minX = positions[i]; }
+          if (positions[i+1] < minY) { minY = positions[i+1]; }
+
+          if (positions[i] > maxX) { maxX = positions[i]; }
+          if (positions[i+1] > maxY) { maxY = positions[i+1]; }
+        }
+
+        return {
+          positions,
+          minX,
+          minY,
+          maxX,
+          maxY
+        }
+      }
+
+      let p1 = makePositions(1000);
+      let p2 = makePositions(100);
+
       let trace1 = {
         mode: 'line',
-        positions: new Float32Array(),
-        positionCount: 1000,
+        positions: p1.positions,
+        min: { x: p1.minX, y: p1.minY },
+        max: { x: p1.maxX, y: p1.maxY },
         line: {
-          fill: [false, true, false, false],
+          fill: [false, false, false, false],
           fillColor: [[0, 0, 1, 0.5], [0, 0, 1, 0.5], [0, 0, 1, 0.5], [0, 0, 1, 0.5]],
           width: 1
         }
@@ -68,8 +100,9 @@
 
       let trace2 = {
         mode: 'scatter',
-        positions: new Float32Array(),
-        positionCount: 100,
+        positions: p2.positions,
+        min: { x: p2.minX, y: p2.minY },
+        max: { x: p2.maxX, y: p2.maxY },
         scatter: {
           size: 10,
           color: [0.0, 0.9, 0.0, 1],

@@ -1,9 +1,9 @@
 import 'skatejs-web-components';
 import * as skate from 'skatejs';
 
-import { debounce } from 'lodash';
+import { debounce, round } from 'lodash';
+import * as d3Scale from 'd3-scale';
 import * as fit from 'canvas-fit';
-import * as gaussRandom from 'gauss-random';
 import * as createScatter from 'gl-scatter2d';
 import * as createScatterFancy from 'gl-scatter2d-fancy';
 import * as createLine from 'gl-line2d';
@@ -12,6 +12,8 @@ import * as createPlot from 'gl-plot2d';
 import { GlPlot2dComponentProps,
          GlPlot2dOptions,
          Line,
+         MinMax,
+         Point,
          Scatter,
          Tick,
          Trace } from './lib';
@@ -43,7 +45,15 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
       traces: skate.prop.array<GlPlot2dComponent, Trace>({
         attribute: true,
         coerce (traces) {
-          return traces.map(trace => new Trace(trace.mode, trace.positions, trace.positionCount, trace.line, trace.scatter));
+          // Turn (or "coerce") each trace into a Trace object.
+          return traces.map(trace => {
+            return new Trace(trace.mode,
+                             trace.positions,
+                             trace.min,
+                             trace.max,
+                             trace.line,
+                             trace.scatter);
+          });
         }
       }),
       width: skate.prop.string({ attribute: true }),
@@ -214,7 +224,8 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
     // Debounce the resize call.
     let debounceResize = debounce(() => {
       resize();
-      this.initAndDrawPlot();
+      this.plot.update(this.options);
+      this.plot.draw();
     }, 200);
 
     // Setup resize event listener.
@@ -246,8 +257,12 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
       return;
     }
 
-    const aspect = this.gl.drawingBufferWidth / this.gl.drawingBufferHeight;
-    const dataBox = [-20, -20 / aspect, 20, 20 / aspect];
+    const extremes = this.findMinMax(this['traces']);
+    const dataBoxPad = 0.5;
+    const dataBox = [extremes.min.x - dataBoxPad, extremes.min.y - dataBoxPad, extremes.max.x + dataBoxPad, extremes.max.y + dataBoxPad];
+
+    const xTicks = this.makeLinearTicks(extremes.min.x, extremes.max.x, 5);
+    const yTicks = this.makeLinearTicks(extremes.min.y, extremes.max.y, 8);
 
     this.options = {
       gl:               this.gl,
@@ -280,7 +295,7 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
       labelFont:        this['labelFont'],
       labelColor:       this['labelColor'],
 
-      ticks:            this['ticks'].length > 0 ? this['ticks'] : [ this.makeTicks(-20, 20, 4), this.makeTicks(-20, 20, 2)],
+      ticks:            this['ticks'].length > 0 ? this['ticks'] : [ xTicks, yTicks ],
       tickEnable:       this['tickEnable'],
       tickPad:          this['tickPad'],
       tickAngle:        this['tickAngle'],
@@ -301,8 +316,6 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
     this.plot = createPlot(this.options);
 
     this['traces'].forEach((trace: Trace) => {
-      trace.positions = this.makePositions(trace.positionCount);
-
       if (trace.line) {
         this.addLinePlot(trace.positions, trace.line);
       }
@@ -325,14 +338,14 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
   /**
    * Helper that adds a line plot to the current plot.
    *
-   * @param {Float32Array} positions
+   * @param {number[]} positions
    * @param {Line} line
    *
    * @memberOf GlPlot2dComponent
    */
-  addLinePlot(positions: Float32Array, line: Line): void {
+  addLinePlot(positions: number[], line: Line): void {
     const linePlot = createLine(this.plot, {
-      positions: positions,
+      positions: new Float32Array(positions),
       fill: line.fill,
       fillColor: line.fillColor,
       width: line.width
@@ -342,14 +355,14 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
   /**
    * Helper that adds a scatter plot to the current plot.
    *
-   * @param {Float32Array} positions
+   * @param {number[]} positions
    * @param {Scatter} scatter
    *
    * @memberOf GlPlot2dComponent
    */
-  addScatterPlot(positions: Float32Array, scatter: Scatter): void {
+  addScatterPlot(positions: number[], scatter: Scatter): void {
     const scatterPlot = createScatter(this.plot, {
-      positions: positions,
+      positions: new Float32Array(positions),
       size: scatter.size,
       color: scatter.color,
       borderSize: scatter.borderSize,
@@ -358,42 +371,58 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
   }
 
   /**
-   * Helper function that makes dummy ticks.
+   * Helper function to make count linear tick marks on domain lo to hi.
+   * Uses d3-scale to do so.
+   * Coerces tick number[] to Tick[].
    *
    * @param {number} lo
    * @param {number} hi
-   * @param {number} step
-   * @returns {Tick[]}
+   * @param {number} count
+   * @returns {number[]}
    *
    * @memberOf GlPlot2dComponent
    */
-  makeTicks(lo: number, hi: number, step: number): Tick[] {
-    let result: Tick[] = [];
+  makeLinearTicks(lo: number, hi: number, count: number): Tick[] {
+    const scale = d3Scale.scaleLinear()
+                         .domain([Math.floor(lo), Math.ceil(hi)]);
 
-    for (let i = lo; i <= hi; i += step) {
-      result.push({x: i, text: i.toString()});
-    }
+    const ticks = scale.ticks(count);
 
-    return result
+    return ticks.map(tick => new Tick(tick));
   }
 
   /**
-   * Helper function that makes dummy positions.
+   * Helper function that finds global min and max points from a list of traces.
    *
-   * @param {number} positionCount
-   * @returns {Float32Array}
+   * @param {Trace[]} traces
+   * @returns {MinMax}
    *
    * @memberOf GlPlot2dComponent
    */
-  makePositions(positionCount: number): Float32Array {
-    let positions = new Float32Array(2 * positionCount)
+  findMinMax(traces: Trace[]): MinMax {
+    let min: Point = new Point(Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER);
+    let max: Point = new Point(Number.MIN_SAFE_INTEGER, Number.MIN_SAFE_INTEGER);
 
-    for (let i = 0; i < 2 * positionCount; i += 2) {
-      positions[i]   = (i / positionCount) * 20 - 20;
-      positions[i+1] = gaussRandom();
+    if (!traces.length) {
+      return { min, max }
+    }
+    else if (traces.length === 1) {
+      return { min: traces[0].min, max: traces[0].max }
+    }
+    else {
+      traces.forEach((trace: Trace) => {
+          if (trace.min.x < min.x) { min.x = trace.min.x; }
+          if (trace.min.y < min.y) { min.y = trace.min.y; }
+
+          if (trace.max.x > max.x) { max.x = trace.max.x; }
+          if (trace.max.y > max.y) { max.y = trace.max.y; }
+      });
     }
 
-    return positions;
+    return {
+      min,
+      max
+    }
   }
 }
 

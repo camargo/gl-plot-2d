@@ -1,7 +1,7 @@
 import 'skatejs-web-components';
 import * as skate from 'skatejs';
 
-import { debounce, first, last } from 'lodash';
+import { debounce, first, last, round } from 'lodash';
 import * as d3Scale from 'd3-scale';
 import * as fit from 'canvas-fit';
 import * as createScatter from 'gl-scatter2d';
@@ -416,7 +416,7 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
 
     const ticks = scale.ticks();
 
-    return ticks.map(tick => new Tick(tick));
+    return ticks.map(tick => new Tick(round(tick, 2)));
   }
 
   /**
@@ -436,7 +436,7 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
 
     const ticks = scale.ticks();
 
-    return ticks.map(tick => new Tick(tick));
+    return ticks.map(tick => new Tick(round(tick, 2)));
   }
 
   /**

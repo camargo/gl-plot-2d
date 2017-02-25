@@ -1,35 +1,29 @@
-import 'skatejs-web-components';
 import * as skate from 'skatejs';
 
-import { debounce, first, last, round } from 'lodash';
-import * as d3Scale from 'd3-scale';
 import * as fit from 'canvas-fit';
-import * as createScatter from 'gl-scatter2d';
-import * as createScatterFancy from 'gl-scatter2d-fancy';
 import * as createLine from 'gl-line2d';
 import * as createPlot from 'gl-plot2d';
+import * as createScatter from 'gl-scatter2d';
+import { debounce } from 'lodash';
 
 import { GlPlot2dComponentProps,
          GlPlot2dOptions,
          Line,
-         MinMax,
-         Point,
          Scatter,
          Tick,
-         Trace } from './lib';
+         Trace } from './';
 
 /**
  * GlPlot2dComponent class.
  *
- * @export
  * @class GlPlot2dComponent
  * @extends {skate.Component<GlPlot2dComponentProps>}
  */
-export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
-  private gl: WebGLRenderingContext | null; // WebGL Context.
-  private canvas: HTMLCanvasElement | null; // Canvas element we render to.
-  private plot: any;                        // Plot object via gl-plot2d.
-  private options: GlPlot2dOptions;         // Plot options for gl-plot2d.
+export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
+  private gl: WebGLRenderingContext | null;   // WebGL Context.
+  private canvas: HTMLCanvasElement | null;   // Canvas element we render to.
+  private plot: any;                          // Plot object via gl-plot2d.
+  private options: GlPlot2dOptions;           // Plot options for gl-plot2d.
 
   /**
    * Custom properties that should be defined on the element. These are set up in the constructor.
@@ -44,9 +38,9 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
       // Custom.
       traces: skate.prop.array<GlPlot2dComponent, Trace>({
         attribute: true,
-        coerce (traces) {
+        coerce(traces) {
           // Turn (or "coerce") each trace into a Trace object.
-          return traces.map(trace => {
+          return traces.map((trace: Trace) => {
             return new Trace(trace.mode,
                              trace.positions,
                              trace.min,
@@ -56,15 +50,16 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
           });
         }
       }),
-      width: skate.prop.string({ attribute: true }),
-      height: skate.prop.string({ attribute: true }),
+
       debug: skate.prop.boolean({ attribute: true }),
+      height: skate.prop.string({ attribute: true }),
+      width: skate.prop.string({ attribute: true }),
 
       // General.
       pixelRatio: skate.prop.number({ attribute: true }),
       screenBox: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
       dataBox: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
-      viewBox:skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
+      viewBox: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
 
       // Title.
       titleEnable: skate.prop.boolean({ attribute: true }),
@@ -94,7 +89,7 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
       labelColor: skate.prop.array<GlPlot2dComponent, number[]>({ attribute: true }),
 
       // Ticks.
-      ticks: skate.prop.array<GlPlot2dComponent, Tick[]>(),
+      ticks: skate.prop.array<GlPlot2dComponent, Tick[]>({ attribute: true }),
       tickEnable: skate.prop.array<GlPlot2dComponent, boolean>({ attribute: true }),
       tickPad: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
       tickAngle: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
@@ -129,19 +124,18 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
    *
    * @memberOf GlPlot2dComponent
    */
-  connectedCallback(): void {
+  public connectedCallback(): void {
     super.connectedCallback();
   }
 
   /**
    * Function that is called to render the element.
    *
-   * @param {GlPlot2dComponentProps} [props]
-   * @returns
+   * @returns {JSX.Element[]}
    *
    * @memberOf GlPlot2dComponent
    */
-  renderCallback(props?: GlPlot2dComponentProps) {
+  public renderCallback(): JSX.Element[] {
     return ([
       <style>
         {this.getStyles()}
@@ -157,7 +151,7 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
    *
    * @memberOf GlPlot2dComponent
    */
-  renderedCallback(): void {
+  public renderedCallback(): void {
     if (this.shadowRoot && !this.canvas) {
       this.canvas = this.shadowRoot.querySelector('canvas');
       this.initResize();
@@ -174,7 +168,7 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
    *
    * @memberOf GlPlot2dComponent
    */
-  attributeChangedCallback(name: string, oldValue: null | string, newValue: null | string): void {
+  public attributeChangedCallback(name: string, oldValue: null | string, newValue: null | string): void {
     super.attributeChangedCallback(name, oldValue, newValue);
   }
 
@@ -183,7 +177,7 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
    *
    * @memberOf GlPlot2dComponent
    */
-  disconnectedCallback(): void {
+  public disconnectedCallback(): void {
     super.disconnectedCallback();
     this.plot.dispose();
   }
@@ -195,7 +189,7 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
    *
    * @memberOf GlPlot2dComponent
    */
-  getStyles(): string {
+  public getStyles(): string {
     const width = this['width'];
     const height = this['height'];
 
@@ -214,15 +208,15 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
    *
    * @memberOf GlPlot2dComponent
    */
-  initResize(): void {
+  public initResize(): void {
     // Setup fit().
-    let resize = fit(this.canvas, null, +window.devicePixelRatio);
+    const resize = fit(this.canvas, null, +window.devicePixelRatio);
 
     // Resize after setting up fit().
     resize();
 
     // Debounce the resize call.
-    let debounceResize = debounce(() => {
+    const debounceResize = debounce(() => {
       resize();
       this.plot.update(this.options);
       this.plot.draw();
@@ -239,7 +233,7 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
    *
    * @memberOf GlPlot2dComponent
    */
-  initAndDrawPlot(): void {
+  public initAndDrawPlot(): void {
     if (this.canvas) {
       this.gl = this.canvas.getContext('webgl');
     }
@@ -257,15 +251,12 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
       return;
     }
 
-    let ticks = this.getTicks('linear');
-    const dataBox = [first(ticks.x).x - 0.25, first(ticks.y).x - 0.25, last(ticks.x).x + 0.25, last(ticks.y).x + 0.25];
-
     this.options = {
       gl:               this.gl,
 
       pixelRatio:       this['pixelRatio'],
       screenBox:        this['screenBox'].length > 0 ? this['screenBox'] : null,
-      dataBox:          this['dataBox'].length > 0 ? this['dataBox'] : dataBox,
+      dataBox:          this['dataBox'].length > 0 ? this['dataBox'] : null,
       viewBox:          this['viewBox'].length > 0 ? this['viewBox'] : null,
 
       titleEnable:      this['titleEnable'],
@@ -291,7 +282,7 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
       labelFont:        this['labelFont'],
       labelColor:       this['labelColor'],
 
-      ticks:            this['ticks'].length > 0 ? this['ticks'] : [ ticks.x, ticks.y ],
+      ticks:            this['ticks'],
       tickEnable:       this['tickEnable'],
       tickPad:          this['tickPad'],
       tickAngle:        this['tickAngle'],
@@ -307,7 +298,7 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
       zeroLineEnable:   this['zeroLineEnable'],
       zeroLineWidth:    this['zeroLineWidth'],
       zeroLineColor:    this['zeroLineColor']
-    }
+    };
 
     this.plot = createPlot(this.options);
 
@@ -339,8 +330,8 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
    *
    * @memberOf GlPlot2dComponent
    */
-  addLinePlot(positions: number[], line: Line): void {
-    const linePlot = createLine(this.plot, {
+  public addLinePlot(positions: number[], line: Line): void {
+    createLine(this.plot, {
       positions: new Float32Array(positions),
       fill: line.fill,
       fillColor: line.fillColor,
@@ -356,8 +347,8 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
    *
    * @memberOf GlPlot2dComponent
    */
-  addScatterPlot(positions: number[], scatter: Scatter): void {
-    const scatterPlot = createScatter(this.plot, {
+  public addScatterPlot(positions: number[], scatter: Scatter): void {
+    createScatter(this.plot, {
       positions: new Float32Array(positions),
       size: scatter.size,
       color: scatter.color,
@@ -365,113 +356,4 @@ export default class GlPlot2dComponent extends skate.Component<GlPlot2dComponent
       borderColor: scatter.borderColor
     });
   }
-
-  /**
-   * Get ticks by type.
-   * TODO: Strong type.
-   *
-   * @param {string} type
-   * @returns {*}
-   *
-   * @memberOf GlPlot2dComponent
-   */
-  getTicks(type: string): any {
-    const extremes = this.findMinMax(this['traces']);
-
-    if (type === 'linear') {
-      return {
-        x: this.getLinearTicks(extremes.min.x, extremes.max.x),
-        y: this.getLinearTicks(extremes.min.y, extremes.max.y)
-      }
-    }
-    else if (type === 'log') {
-      return {
-        x: this.getLogTicks(extremes.min.x, extremes.max.x),
-        y: this.getLogTicks(extremes.min.y, extremes.max.y)
-      }
-    }
-    else {
-      return {
-        x: [],
-        y: []
-      };
-    }
-  }
-
-  /**
-   * Helper function to make count linear tick marks on domain lo to hi.
-   * Uses d3-scale to do so.
-   * Coerces tick number[] to Tick[].
-   *
-   * @param {number} lo
-   * @param {number} hi
-   * @returns {Tick[]}
-   *
-   * @memberOf GlPlot2dComponent
-   */
-  getLinearTicks(lo: number, hi: number): Tick[] {
-    const scale = d3Scale.scaleLinear()
-                         .domain([Math.floor(lo), Math.ceil(hi)])
-                         .nice();
-
-    const ticks = scale.ticks();
-
-    return ticks.map(tick => new Tick(round(tick, 2)));
-  }
-
-  /**
-   * Helper function to make count log tick marks on domain lo to hi.
-   * Uses d3-scale to do so.
-   * Coerces tick number[] to Tick[].
-   *
-   * @param {number} lo
-   * @param {number} hi
-   * @returns {Tick[]}
-   *
-   * @memberOf GlPlot2dComponent
-   */
-  getLogTicks(lo: number, hi: number): Tick[] {
-    const scale = d3Scale.scaleLog()
-                         .domain([Math.max(1, Math.floor(lo)), Math.ceil(hi)]);
-
-    const ticks = scale.ticks();
-
-    return ticks.map(tick => new Tick(round(tick, 2)));
-  }
-
-  /**
-   * Helper function that finds global min and max points from a list of traces.
-   *
-   * @param {Trace[]} traces
-   * @returns {MinMax}
-   *
-   * @memberOf GlPlot2dComponent
-   */
-  findMinMax(traces: Trace[]): MinMax {
-    let min: Point = new Point(Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER);
-    let max: Point = new Point(Number.MIN_SAFE_INTEGER, Number.MIN_SAFE_INTEGER);
-
-    if (!traces.length) {
-      return { min, max }
-    }
-    else if (traces.length === 1) {
-      return { min: traces[0].min, max: traces[0].max }
-    }
-    else {
-      traces.forEach((trace: Trace) => {
-        if (trace.min.x < min.x) { min.x = trace.min.x; }
-        if (trace.min.y < min.y) { min.y = trace.min.y; }
-
-        if (trace.max.x > max.x) { max.x = trace.max.x; }
-        if (trace.max.y > max.y) { max.y = trace.max.y; }
-      });
-    }
-
-    return {
-      min,
-      max
-    }
-  }
 }
-
-customElements.define('gl-plot-2d', GlPlot2dComponent);

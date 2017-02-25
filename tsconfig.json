@@ -14,15 +14,23 @@
 		],
 		"jsx": "react",
 		"jsxFactory": "skate.h",
+    "alwaysStrict": true,
+    "noEmitOnError": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
 		"noImplicitAny": false,
 		"strictNullChecks": true,
 		"sourceMap": true,
 		"forceConsistentCasingInFileNames": true,
 		"importHelpers": true,
+    "removeComments": true,
 		"newLine": "LF"
 	},
 	"include": [
-		"index.tsx"
+		"index.ts"
 	],
   "exclude": [
 		"node_modules"

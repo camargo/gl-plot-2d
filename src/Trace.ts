@@ -24,8 +24,8 @@ export class Trace {
    * @param {number[]} positions
    * @param {Point} min
    * @param {Point} max
-   * @param {Line} line
-   * @param {Scatter} scatter
+   * @param {(Line | null)} line
+   * @param {(Scatter | null)} scatter
    *
    * @memberOf Trace
    */
@@ -33,8 +33,8 @@ export class Trace {
               positions: number[],
               min: Point,
               max: Point,
-              line: Line,
-              scatter: Scatter) {
+              line: Line | null,
+              scatter: Scatter | null) {
     this.mode = mode;
     this.positions = positions;
     this.min = new Point(min.x, min.y);

@@ -2,12 +2,14 @@
 /**
  * Tick.
  *
+ * This class represents a tick that gl-plot2d uses.
+ *
  * @export
  * @class Tick
  */
 export class Tick {
-  x: number;
-  text: string;
+  public x: number;
+  public text: string;
 
   /**
    * Creates an instance of Tick.

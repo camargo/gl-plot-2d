@@ -1,7 +1,6 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: __dirname + '/index.tsx',
+  entry: __dirname + '/index.ts',
 
   resolve: {
     extensions: [ '.ts', '.tsx', '.js', '.glsl' ]
@@ -14,20 +13,11 @@ module.exports = {
     ]
   },
 
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: './index.html'
-    })
-  ],
-
   output: {
-    path: __dirname + '/dist',
-    filename: 'gl-plot-2d.js'
-  },
-
-  devServer: {
-    historyApiFallback: true,
-    stats: 'minimal'
+    path: '.',
+    filename: 'index.js',
+    library: 'glPlot2d',
+    libraryTarget: 'umd'
   },
 
   performance: {

@@ -1,8 +1,11 @@
+export { GlPlot2dComponent } from './GlPlot2dComponent';
 export { GlPlot2dOptions } from './GlPlot2dOptions';
 export { GlPlot2dComponentProps } from './GlPlot2dComponentProps';
+export * from './GlPlot2dUtils';
 export { Line } from './Line';
-export { MinMax } from './MinMax';
 export { Point } from './Point';
+export { PointPair } from './PointPair';
 export { Scatter } from './Scatter';
 export { Tick } from './Tick';
+export { TickListPair } from './TickListPair';
 export { Trace } from './Trace';

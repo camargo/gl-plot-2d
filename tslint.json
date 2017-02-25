@@ -1,0 +1,29 @@
+{
+  "extends": "tslint:latest",
+  "rules": {
+    /*
+     * Any rules specified here will override those from the base config we are extending.
+     */
+    "curly": true,
+    "interface-name": [true, "never-prefix"],
+    "no-console": [true, "log"],
+    "no-string-literal": false,
+    "object-literal-sort-keys": false,
+    "one-line": [false, "check-catch", "check-finally", "check-else"],
+    "ordered-imports": false,
+    "quotemark": [true, "single", "avoid-escape"],
+    "trailing-comma": [false, {"multiline": "always", "singleline": "never"}]
+  },
+  "jsRules": {
+    /*
+     * Any rules specified here will override those from the base config we are extending.
+     */
+    "curly": true
+  },
+  "rulesDirectory": [
+    /*
+     * A list of relative or absolute paths to directories that contain custom rules.
+     * See the Custom Rules documentation below for more details.
+     */
+  ]
+}

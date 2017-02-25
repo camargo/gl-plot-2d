@@ -1,14 +1,19 @@
-
 import 'skatejs-web-components';
 
-import {
+export {
   GlPlot2dComponent,
-  findMinMax,
-  getTicks,
+  GlPlot2dComponentProps,
+  GlPlot2dOptions,
   getLinearTicks,
-  getLogTicks
+  getLogTicks,
+  getMinMax,
+  getRandomPositions,
+  getTicks,
+  Line,
+  Point,
+  PointPair,
+  Scatter,
+  Tick,
+  TickListPair,
+  Trace
 } from './src';
-
-export { findMinMax, getTicks, getLinearTicks, getLogTicks };
-
-customElements.define('gl-plot-2d', GlPlot2dComponent);

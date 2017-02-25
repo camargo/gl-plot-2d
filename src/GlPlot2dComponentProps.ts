@@ -1,4 +1,3 @@
-
 import { Tick, Trace } from './';
 
 /**

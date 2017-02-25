@@ -16,6 +16,7 @@ import { GlPlot2dComponentProps,
 /**
  * GlPlot2dComponent class.
  *
+ * @export
  * @class GlPlot2dComponent
  * @extends {skate.Component<GlPlot2dComponentProps>}
  */
@@ -357,3 +358,5 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
     });
   }
 }
+
+customElements.define('gl-plot-2d', GlPlot2dComponent);

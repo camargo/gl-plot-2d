@@ -1,4 +1,3 @@
-
 import { Line, Point, Scatter } from './';
 
 /**

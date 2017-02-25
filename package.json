@@ -4,7 +4,8 @@
   "description": "A Web Component for gl-plot2d.",
   "main": "index.js",
   "scripts": {
-    "build:dev": "webpack"
+    "build:dev": "webpack",
+    "lint": "tslint \"src/**/*.ts\""
   },
   "author": "Chris Camargo",
   "devDependencies": {

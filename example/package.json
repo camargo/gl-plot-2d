@@ -16,6 +16,7 @@
     "gl-plot-2d": "..",
     "react": "15.4.2",
     "react-dom": "15.4.2",
+    "skatejs": "4.6.7",
     "webpack": "2.2.1",
     "webpack-dev-server": "2.4.1"
   }

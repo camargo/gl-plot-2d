@@ -10,7 +10,6 @@ import { GlPlot2dComponentProps,
          GlPlot2dOptions,
          Line,
          Scatter,
-         Tick,
          Trace } from './';
 
 /**
@@ -23,8 +22,7 @@ import { GlPlot2dComponentProps,
 export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
   private gl: WebGLRenderingContext | null;   // WebGL Context.
   private canvas: HTMLCanvasElement | null;   // Canvas element we render to.
-  private plot: any;                          // Plot object via gl-plot2d.
-  private options: GlPlot2dOptions;           // Plot options for gl-plot2d.
+  private plot: any | null;                   // Plot object via gl-plot2d.
 
   /**
    * Custom properties that should be defined on the element. These are set up in the constructor.
@@ -51,73 +49,13 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
           });
         }
       }),
-
       debug: skate.prop.boolean({ attribute: true }),
       height: skate.prop.string({ attribute: true }),
       width: skate.prop.string({ attribute: true }),
 
-      // General.
-      pixelRatio: skate.prop.number({ attribute: true }),
-      screenBox: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
-      dataBox: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
-      viewBox: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
-
-      // Title.
-      titleEnable: skate.prop.boolean({ attribute: true }),
-      title: skate.prop.string({ attribute: true }),
-      titleCenter: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
-      titleAngle: skate.prop.number({ attribute: true }),
-      titleColor: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
-      titleFont: skate.prop.string({ attribute: true }),
-      titleSize: skate.prop.number({ attribute: true }),
-
-      // Background color.
-      backgroundColor: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
-
-      // Border.
-      borderColor: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
-      borderLineEnable: skate.prop.array<GlPlot2dComponent, boolean>({ attribute: true }),
-      borderLineWidth: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
-      borderLineColor: skate.prop.array<GlPlot2dComponent, number[]>({ attribute: true }),
-
-      // Labels.
-      labels: skate.prop.array<GlPlot2dComponent, string>({ attribute: true }),
-      labelEnable: skate.prop.array<GlPlot2dComponent, boolean>({ attribute: true }),
-      labelAngle: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
-      labelPad: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
-      labelSize: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
-      labelFont: skate.prop.array<GlPlot2dComponent, string>({ attribute: true }),
-      labelColor: skate.prop.array<GlPlot2dComponent, number[]>({ attribute: true }),
-
-      // Ticks.
-      ticks: skate.prop.array<GlPlot2dComponent, Tick[]>({ attribute: true }),
-      tickEnable: skate.prop.array<GlPlot2dComponent, boolean>({ attribute: true }),
-      tickPad: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
-      tickAngle: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
-      tickColor: skate.prop.array<GlPlot2dComponent, number[]>({ attribute: true }),
-      tickMarkWidth: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
-      tickMarkLength: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
-      tickMarkColor: skate.prop.array<GlPlot2dComponent, number[]>({ attribute: true }),
-
-      // Grid lines.
-      gridLineEnable: skate.prop.array<GlPlot2dComponent, boolean>({ attribute: true }),
-      gridLineColor: skate.prop.array<GlPlot2dComponent, number[]>({ attribute: true }),
-      gridLineWidth: skate.prop.array<GlPlot2dComponent, number>({ attribute: true }),
-
-      // Zero lines.
-      zeroLineEnable: skate.prop.array<GlPlot2dComponent, boolean>({ attribute: true }),
-      zeroLineColor: skate.prop.array<GlPlot2dComponent, number[]>({ attribute: true }),
-      zeroLineWidth: skate.prop.array<GlPlot2dComponent, number>({ attribute: true })
+      // Specific to gl-plot2d.
+      plotOptions: skate.prop.object<GlPlot2dComponent, GlPlot2dOptions>({ attribute: true })
     };
-  }
-
-  /**
-   * Creates an instance of GlPlot2dComponent.
-   *
-   * @memberOf GlPlot2dComponent
-   */
-  constructor() {
-    super();
   }
 
   /**
@@ -156,7 +94,7 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
     if (this.shadowRoot && !this.canvas) {
       this.canvas = this.shadowRoot.querySelector('canvas');
       this.initResize();
-      this.initAndDrawPlot();
+      this.initPlot();
     }
   }
 
@@ -171,6 +109,22 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
    */
   public attributeChangedCallback(name: string, oldValue: null | string, newValue: null | string): void {
     super.attributeChangedCallback(name, oldValue, newValue);
+
+    if (this.gl && this.plot) {
+      switch (name) {
+        case 'plot-options':
+          if (newValue) {
+            this['plotOptions'] = JSON.parse(newValue);
+            this['plotOptions'].gl = this.gl;
+          }
+          break;
+        default:
+          break;
+      }
+
+      this.plot.update(this['plotOptions']);
+      this.drawPlot();
+    }
   }
 
   /**
@@ -180,7 +134,10 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
    */
   public disconnectedCallback(): void {
     super.disconnectedCallback();
-    this.plot.dispose();
+
+    if (this.plot) {
+      this.plot.dispose();
+    }
   }
 
   /**
@@ -219,8 +176,8 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
     // Debounce the resize call.
     const debounceResize = debounce(() => {
       resize();
-      this.plot.update(this.options);
-      this.plot.draw();
+      this.plot.update(this['plotOptions']);
+      this.drawPlot();
     }, 200);
 
     // Setup resize event listener.
@@ -228,13 +185,13 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
   }
 
   /**
-   * Helper function that initializes and draws a plot.
+   * Helper function that initializes the plot.
    *
    * @returns {void}
    *
    * @memberOf GlPlot2dComponent
    */
-  public initAndDrawPlot(): void {
+  public initPlot(): void {
     if (this.canvas) {
       this.gl = this.canvas.getContext('webgl');
     }
@@ -252,56 +209,9 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
       return;
     }
 
-    this.options = {
-      gl:               this.gl,
+    this['plotOptions'].gl = this.gl;
 
-      pixelRatio:       this['pixelRatio'],
-      screenBox:        this['screenBox'].length > 0 ? this['screenBox'] : null,
-      dataBox:          this['dataBox'].length > 0 ? this['dataBox'] : null,
-      viewBox:          this['viewBox'].length > 0 ? this['viewBox'] : null,
-
-      titleEnable:      this['titleEnable'],
-      title:            this['title'],
-      titleCenter:      this['titleCenter'],
-      titleAngle:       this['titleAngle'],
-      titleColor:       this['titleColor'],
-      titleFont:        this['titleFont'],
-      titleSize:        this['titleSize'],
-
-      backgroundColor:  this['backgroundColor'],
-
-      borderColor:      this['borderColor'],
-      borderLineEnable: this['borderLineEnable'],
-      borderLineWidth:  this['borderLineWidth'],
-      borderLineColor:  this['borderLineColor'],
-
-      labels:           this['labels'],
-      labelEnable:      this['labelEnable'],
-      labelAngle:       this['labelAngle'],
-      labelPad:         this['labelPad'],
-      labelSize:        this['labelSize'],
-      labelFont:        this['labelFont'],
-      labelColor:       this['labelColor'],
-
-      ticks:            this['ticks'],
-      tickEnable:       this['tickEnable'],
-      tickPad:          this['tickPad'],
-      tickAngle:        this['tickAngle'],
-      tickColor:        this['tickColor'],
-      tickMarkWidth:    this['tickMarkWidth'],
-      tickMarkLength:   this['tickMarkLength'],
-      tickMarkColor:    this['tickMarkColor'],
-
-      gridLineEnable:   this['gridLineEnable'],
-      gridLineColor:    this['gridLineColor'],
-      gridLineWidth:    this['gridLineWidth'],
-
-      zeroLineEnable:   this['zeroLineEnable'],
-      zeroLineWidth:    this['zeroLineWidth'],
-      zeroLineColor:    this['zeroLineColor']
-    };
-
-    this.plot = createPlot(this.options);
+    this.plot = createPlot(this['plotOptions']);
 
     this['traces'].forEach((trace: Trace) => {
       if (trace.line) {
@@ -312,6 +222,15 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
       }
     });
 
+    skate.emit(this, 'gl-plot-2d-init-plot-done');
+  }
+
+  /**
+   * Helper tha draws the plot.
+   *
+   * @memberOf GlPlot2dComponent
+   */
+  public drawPlot(): void {
     if (this['debug']) {
       console.time('drawTime');
     }
@@ -321,6 +240,8 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
     if (this['debug']) {
       console.timeEnd('drawTime');
     }
+
+    skate.emit(this, 'gl-plot-2d-draw-plot-done');
   }
 
   /**
@@ -359,4 +280,19 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
   }
 }
 
-customElements.define('gl-plot-2d', GlPlot2dComponent);
+/**
+ * Helper definition function for GlPlot2d.
+ *
+ * @export
+ * @param {string} [name]
+ * @returns {*}
+ */
+export function defineGlPlot2D(name?: string): any {
+  if (!name) {
+    name = 'gl-plot-2d';
+  }
+
+  customElements.define(name, GlPlot2dComponent);
+
+  return customElements.get(name);
+}

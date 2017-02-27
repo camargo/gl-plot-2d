@@ -36,8 +36,8 @@ export class Trace {
               scatter: Scatter | null) {
     this.mode = mode;
     this.positions = positions;
-    this.min = new Point(min.x, min.y);
-    this.max = new Point(max.x, max.y);
+    this.min = min;
+    this.max = max;
 
     if (line) {
       this.line = new Line(line.fill, line.fillColor, line.width);

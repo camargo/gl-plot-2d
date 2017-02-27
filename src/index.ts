@@ -1,4 +1,4 @@
-export { GlPlot2dComponent } from './GlPlot2dComponent';
+export { defineGlPlot2D, GlPlot2dComponent } from './GlPlot2dComponent';
 export { GlPlot2dOptions } from './GlPlot2dOptions';
 export { GlPlot2dComponentProps } from './GlPlot2dComponentProps';
 export * from './GlPlot2dUtils';

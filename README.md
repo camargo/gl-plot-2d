@@ -8,7 +8,7 @@ This is a Web Component that wraps [gl-plot2d](https://github.com/gl-vis/gl-plot
 
 ```
 npm install
-npm run dev
+bash build.sh
 ```
 
 ## Average Draw Times

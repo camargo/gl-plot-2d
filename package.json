@@ -8,6 +8,7 @@
     "lint": "tslint \"src/**/*.ts\""
   },
   "author": "Chris Camargo",
+  "license": "MIT",
   "devDependencies": {
     "canvas-fit": "1.5.0",
     "d3-scale": "1.0.4",
@@ -25,7 +26,7 @@
     "skatejs-web-components": "5.2.1",
     "ts-loader": "2.0.1",
     "tslib": "1.6.0",
-    "tslint": "^4.4.2",
+    "tslint": "4.4.2",
     "typescript": "2.2.1",
     "webpack": "2.2.1"
   },

@@ -13,7 +13,7 @@ import { Tick } from './';
  */
 export interface GlPlot2dOptions {
   // General.
-  gl: WebGLRenderingContext;
+  gl: WebGLRenderingContext | null;
   pixelRatio: number;
   screenBox: number[] | null;
   dataBox: number[] | null;

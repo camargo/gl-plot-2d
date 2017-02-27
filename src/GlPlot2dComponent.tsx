@@ -156,28 +156,56 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
         width: ${width};
         height: ${height};
       }
+
+      canvas {
+        position: relative !important;
+      }
     `;
 
     return styles;
   }
 
   /**
+   * Resize function that uses canvas-fit.
+   * Sets the viewBox to contain the entire containing div.
+   *
+   * @memberOf GlPlot2dComponent
+   */
+  public resize(): void {
+    // Setup fit().
+    const resize = fit(this.canvas, null, +window.devicePixelRatio);
+
+    if (this.shadowRoot) {
+      // Get the div around the canvas.
+      let div = this.shadowRoot.querySelector('div');
+
+      if (div) {
+        let boundingClientRect = div.getBoundingClientRect();
+        this['plotOptions'].viewBox = [50, 1, boundingClientRect.width - 1, boundingClientRect.height - 1];
+      }
+    }
+
+    // Resize after setting up fit().
+    resize();
+  }
+
+  /**
    * Helper function that initializes resize canvas logic.
+   * Should be only called once on component initialization.
    *
    * @memberOf GlPlot2dComponent
    */
   public initResize(): void {
-    // Setup fit().
-    const resize = fit(this.canvas, null, +window.devicePixelRatio);
-
-    // Resize after setting up fit().
-    resize();
+    this.resize();
 
     // Debounce the resize call.
     const debounceResize = debounce(() => {
-      resize();
-      this.plot.update(this['plotOptions']);
-      this.drawPlot();
+      this.resize();
+
+      if (this.plot) {
+        this.plot.update(this['plotOptions']);
+        this.drawPlot();
+      }
     }, 200);
 
     // Setup resize event listener.
@@ -255,6 +283,7 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
   public addLinePlot(positions: number[], line: Line): void {
     createLine(this.plot, {
       positions: new Float32Array(positions),
+      color: line.color,
       fill: line.fill,
       fillColor: line.fillColor,
       width: line.width

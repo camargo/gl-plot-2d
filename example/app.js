@@ -11,12 +11,19 @@ class App extends Component {
   }
 
   componentWillMount() {
+    // TODO: Unique event names!
     document.addEventListener('gl-plot-2d-init-plot-done', () => {
-      this.glPlot2dComponent.drawPlot();
+      if (this.glPlot2dComponent1.plot) {
+        this.glPlot2dComponent1.drawPlot();
+      }
+
+      if (this.glPlot2dComponent2.plot) {
+        this.glPlot2dComponent2.drawPlot();
+      }
     });
   }
 
-  componentDidMount() {
+  makePlot1() {
     const p1 = glPlot2d.getRandomPositions(1000);
     const p2 = glPlot2d.getRandomPositions(100);
 
@@ -26,6 +33,7 @@ class App extends Component {
       min: p1.min,
       max: p1.max,
       line: {
+        color: [0, 0, 1, 1],
         fill: [false, false, false, false],
         fillColor: [[0, 0, 1, 0.5], [0, 0, 1, 0.5], [0, 0, 1, 0.5], [0, 0, 1, 0.5]],
         width: 1
@@ -45,14 +53,14 @@ class App extends Component {
       }
     };
 
-    this.traces = [trace1, trace2];
-    this.debug = true;
-    this.height = '300px';
-    this.width = '100%';
+    this.traces1 = [trace1, trace2];
+    this.debug1 = true;
+    this.height1 = '300px';
+    this.width1 = '100%';
 
-    const tickList = glPlot2d.getTicks(this.traces, 'linear', 1, true);
+    const tickList = glPlot2d.getTicks(this.traces1, 'linear', 1, true);
 
-    this.plotOptions = {
+    this.plotOptions1 = {
       pixelRatio: 1,
       screenBox: null,
       dataBox: [tickList.t1[0].x - 0.25, tickList.t2[0].x - 0.25, tickList.t1[tickList.t1.length - 1].x + 0.25, tickList.t2[tickList.t2.length - 1].x + 0.25],
@@ -77,13 +85,99 @@ class App extends Component {
       labelFont: ["sans-serif", "sans-serif"],
       labelColor: [[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
       ticks: [tickList.t1, tickList.t2],
-      tickEnable: [true, true, false, false],
+      tickEnable: [false, true, false, false],
       tickPad: [20, 20, 0, 0],
       tickAngle: [0, 0, 0, 0],
       tickColor: [[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
       tickMarkWidth: [1, 1, 1, 1],
       tickMarkLength: [4, 4, 4, 4],
-      tickMarkColor: [[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
+      tickMarkColor: [[0, 0, 0, 0], [0, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
+      gridLineEnable: [false, true],
+      gridLineColor: [[0, 0, 0, 0.5], [0, 0, 0, 0.5]],
+      gridLineWidth: [0.5, 0.5],
+      zeroLineEnable: [false, false],
+      zeroLineWidth: [3, 3],
+      zeroLineColor: [[0, 0, 0, 0.5], [0, 0, 0, 0.5]]
+    }
+
+    props(this.glPlot2dComponent1, {
+      traces: this.traces1,
+      debug: this.debug1,
+      height: this.height1,
+      width: this.width1,
+      plotOptions: this.plotOptions1
+    });
+  }
+
+  makePlot2() {
+    const p3 = glPlot2d.getRandomPositions(1000);
+    const p4 = glPlot2d.getRandomPositions(100);
+
+    const trace3 = {
+      mode: 'line',
+      positions: p3.positions,
+      min: p3.min,
+      max: p3.max,
+      line: {
+        color: [0, 1, 0, 1],
+        fill: [false, false, false, false],
+        fillColor: [[0, 1, 0, 0.5], [0, 1, 0, 0.5], [0, 1, 0, 0.5], [0, 1, 0, 0.5]],
+        width: 2
+      }
+    };
+
+    const trace4 = {
+      mode: 'scatter',
+      positions: p4.positions,
+      min: p4.min,
+      max: p4.max,
+      scatter: {
+        size: 10,
+        color: [0.8, 0.0, 0.0, 1],
+        borderSize: 1,
+        borderColor: [0, 0, 0, 1]
+      }
+    };
+
+    this.traces2 = [trace3, trace4];
+    this.debug2 = true;
+    this.height2 = '300px';
+    this.width2 = '100%';
+
+    const tickList = glPlot2d.getTicks(this.traces1, 'log', 1, false);
+
+    this.plotOptions2 = {
+      pixelRatio: 1,
+      screenBox: null,
+      dataBox: [tickList.t1[0].x - 0.25, tickList.t2[0].x - 0.25, tickList.t1[tickList.t1.length - 1].x + 0.25, tickList.t2[tickList.t2.length - 1].x + 0.25],
+      viewBox: null,
+      titleEnabe: false,
+      title: '',
+      titleCenter: [190, 280],
+      titleAngle: 0,
+      titleColor: [1.0, 0.3, 0.3, 1],
+      titleFont: 'sans-serif',
+      titleSize: 24,
+      backgroundColor: [0, 0, 0, 0],
+      borderColor: [1, 1, 1, 1],
+      borderLineEnable: [true, true, true, true],
+      borderLineWidth: [2, 2, 2, 2],
+      borderLineColor: [[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1]],
+      labels: ["X", "Y"],
+      labelEnable: [false, false, true, true],
+      labelAngle: [0, 0, 0, 4.71],
+      labelPad: [0, 20, 0, 0],
+      labelSize: [24, 24],
+      labelFont: ["sans-serif", "sans-serif"],
+      labelColor: [[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
+      ticks: [tickList.t1, tickList.t2],
+      tickEnable: [false, true, false, false],
+      tickPad: [20, 20, 0, 0],
+      tickAngle: [0, 0, 0, 0],
+      tickColor: [[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
+      tickMarkWidth: [1, 1, 1, 1],
+      tickMarkLength: [4, 4, 4, 4],
+      tickMarkColor: [[0, 0, 0, 0], [0, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
       gridLineEnable: [true, true],
       gridLineColor: [[0, 0, 0, 0.5], [0, 0, 0, 0.5]],
       gridLineWidth: [0.5, 0.5],
@@ -92,43 +186,48 @@ class App extends Component {
       zeroLineColor: [[0, 0, 0, 0.5], [0, 0, 0, 0.5]]
     }
 
-    props(this.glPlot2dComponent, {
-      traces: this.traces,
-      debug: this.debug,
-      height: this.height,
-      width: this.width,
-      plotOptions: this.plotOptions
+    props(this.glPlot2dComponent2, {
+      traces: this.traces2,
+      debug: this.debug2,
+      height: this.height2,
+      width: this.width2,
+      plotOptions: this.plotOptions2
     });
   }
 
-  onIncreasePixelRatio() {
-    this.plotOptions.pixelRatio = ++this.plotOptions.pixelRatio;
-    props(this.glPlot2dComponent, { plotOptions: this.plotOptions });
-  }
-
-  onDecreasePixelRatio() {
-    if (this.plotOptions.pixelRatio > 1) {
-      this.plotOptions.pixelRatio = --this.plotOptions.pixelRatio;
-      props(this.glPlot2dComponent, { plotOptions: this.plotOptions });
-    }
+  componentDidMount() {
+    this.makePlot1();
+    this.makePlot2();
   }
 
   render() {
+    let outerContainer = {
+      width: '100%'
+    };
+
+    let innerContainer = {
+      paddingBottom: '0.5px'
+    };
+
     return (
-      <div>
-        <div>
+      <div style={outerContainer}>
+        <div style={innerContainer}>
           <gl-plot-2d
-            id="glPlot2d"
-            ref={(glPlot2dComponent) => { this.glPlot2dComponent = glPlot2dComponent }}
-            traces={this.traces}
-            debug
-            height={this.height}
-            width={this.width}
-            plotOptions={this.plotOptions} />
+            ref={(glPlot2dComponent1) => { this.glPlot2dComponent1 = glPlot2dComponent1 }}
+            traces={this.traces1}
+            debug={this.debug1}
+            height={this.height1}
+            width={this.width1}
+            plotOptions={this.plotOptions1} />
         </div>
-        <div>
-          <button onClick={this.onIncreasePixelRatio.bind(this)}>Increase Pixel Ratio</button>
-          <button onClick={this.onDecreasePixelRatio.bind(this)}>Decrease Pixel Ratio</button>
+        <div style={innerContainer}>
+          <gl-plot-2d
+            ref={(glPlot2dComponent2) => { this.glPlot2dComponent2 = glPlot2dComponent2 }}
+            traces={this.traces2}
+            debug={this.debug2}
+            height={this.height2}
+            width={this.width2}
+            plotOptions={this.plotOptions2} />
         </div>
       </div>
     );

@@ -40,7 +40,7 @@ export class Trace {
     this.max = max;
 
     if (line) {
-      this.line = new Line(line.fill, line.fillColor, line.width);
+      this.line = new Line(line.color, line.fill, line.fillColor, line.width);
     }
     else {
       this.line = null;

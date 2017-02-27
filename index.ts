@@ -1,7 +1,7 @@
 import 'skatejs-web-components';
 
 export {
-  defineGlPlot2D,
+  defineGlPlot2d,
   GlPlot2dComponent,
   GlPlot2dComponentProps,
   GlPlot2dOptions,

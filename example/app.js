@@ -7,7 +7,7 @@ import * as glPlot2d from 'gl-plot-2d';
 class App extends Component {
   constructor() {
     super();
-    glPlot2d.defineGlPlot2D('gl-plot-2d');
+    glPlot2d.defineGlPlot2d('gl-plot-2d');
   }
 
   componentWillMount() {

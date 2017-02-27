@@ -287,7 +287,7 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
  * @param {string} [name]
  * @returns {*}
  */
-export function defineGlPlot2D(name?: string): any {
+export function defineGlPlot2d(name?: string): any {
   if (!name) {
     name = 'gl-plot-2d';
   }

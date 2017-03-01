@@ -10,6 +10,7 @@ import { GlPlot2dOptions, Trace } from './';
  */
 export interface GlPlot2dComponentProps {
   // Custom.
+  name: string;
   traces: Trace[];
   debug: boolean;
   height: string;

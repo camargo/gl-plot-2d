@@ -4,6 +4,7 @@
     "curly": true,
     "interface-name": [true, "never-prefix"],
     "no-console": [true, "log"],
+    "no-debugger": false,
     "no-string-literal": false,
     "object-literal-sort-keys": false,
     "one-line": [false, "check-catch", "check-finally", "check-else"],

@@ -35,6 +35,7 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
   static get props(): skate.ComponentProps<GlPlot2dComponent, GlPlot2dComponentProps> {
     return {
       // Custom.
+      name: skate.prop.string({ attribute: true }),
       traces: skate.prop.array<GlPlot2dComponent, Trace>({
         attribute: true,
         coerce(traces) {
@@ -91,10 +92,12 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
    * @memberOf GlPlot2dComponent
    */
   public renderedCallback(): void {
-    if (this.shadowRoot && !this.canvas) {
+    if (this.shadowRoot && !this.canvas && !this.plot) {
       this.canvas = this.shadowRoot.querySelector('canvas');
-      this.initResize();
+      this.initResizeEvents();
       this.initPlot();
+      this.fitCanvas();
+      this.drawPlot();
     }
   }
 
@@ -115,14 +118,14 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
         case 'plot-options':
           if (newValue) {
             this['plotOptions'] = JSON.parse(newValue);
-            this['plotOptions'].gl = this.gl;
           }
           break;
         default:
           break;
       }
 
-      this.plot.update(this['plotOptions']);
+      this['plotOptions'].gl = this.gl;
+      this.fitCanvas();
       this.drawPlot();
     }
   }
@@ -148,13 +151,10 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
    * @memberOf GlPlot2dComponent
    */
   public getStyles(): string {
-    const width = this['width'];
-    const height = this['height'];
-
     const styles = `
       div {
-        width: ${width};
-        height: ${height};
+        width: ${this['width']};
+        height: ${this['height']};
       }
 
       canvas {
@@ -166,49 +166,46 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
   }
 
   /**
-   * Resize function that uses canvas-fit.
-   * Sets the viewBox to contain the entire containing div.
+   * Resize fit canvas function that uses canvas-fit.
+   * Sets the viewBox to contain the entire surrounding div.
    *
    * @memberOf GlPlot2dComponent
    */
-  public resize(): void {
+  public fitCanvas(): void {
     // Setup fit().
     const resize = fit(this.canvas, null, +window.devicePixelRatio);
 
     if (this.shadowRoot) {
       // Get the div around the canvas.
-      let div = this.shadowRoot.querySelector('div');
+      const div = this.shadowRoot.querySelector('div');
 
       if (div) {
-        let boundingClientRect = div.getBoundingClientRect();
+        const boundingClientRect = div.getBoundingClientRect();
+
+        // Set the viewBox to contain the entire surrounding div.
+        // TODO: Parameterize the viewBox.
         this['plotOptions'].viewBox = [50, 1, boundingClientRect.width - 1, boundingClientRect.height - 1];
       }
     }
 
-    // Resize after setting up fit().
+    // Trigger resize.
     resize();
   }
 
   /**
-   * Helper function that initializes resize canvas logic.
+   * Helper function that initializes resize events.
    * Should be only called once on component initialization.
    *
    * @memberOf GlPlot2dComponent
    */
-  public initResize(): void {
-    this.resize();
-
+  public initResizeEvents(): void {
     // Debounce the resize call.
     const debounceResize = debounce(() => {
-      this.resize();
-
-      if (this.plot) {
-        this.plot.update(this['plotOptions']);
-        this.drawPlot();
-      }
+      this.fitCanvas();
+      this.drawPlot();
     }, 200);
 
-    // Setup resize event listener.
+    // Setup debounced window resize event listener.
     window.addEventListener('resize', debounceResize, false);
   }
 
@@ -238,7 +235,6 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
     }
 
     this['plotOptions'].gl = this.gl;
-
     this.plot = createPlot(this['plotOptions']);
 
     this['traces'].forEach((trace: Trace) => {
@@ -250,7 +246,7 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
       }
     });
 
-    skate.emit(this, 'gl-plot-2d-init-plot-done');
+    skate.emit(this, `gl-plot-2d-init-plot-done-${this['name']}`);
   }
 
   /**
@@ -259,6 +255,9 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
    * @memberOf GlPlot2dComponent
    */
   public drawPlot(): void {
+    // Make sure plot is updated with current plotOptions before drawing.
+    this.plot.update(this['plotOptions']);
+
     if (this['debug']) {
       console.time('drawTime');
     }
@@ -269,7 +268,7 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
       console.timeEnd('drawTime');
     }
 
-    skate.emit(this, 'gl-plot-2d-draw-plot-done');
+    skate.emit(this, `gl-plot-2d-draw-plot-done-${this['name']}`);
   }
 
   /**

@@ -52,7 +52,38 @@ export function getLogTicks(lo: number,
                             precision: number,
                             nice: boolean): Tick[] {
   let scale = d3Scale.scaleLog()
-                     .domain([Math.max(1, Math.floor(lo)), Math.ceil(hi)]);
+                     .domain([Math.max(1.0, Math.floor(lo)), Math.ceil(hi)]);
+
+  if (nice) {
+    scale = scale.nice();
+  }
+
+  const ticks = scale.ticks();
+
+  return ticks.map((tick: number) => new Tick(round(tick, precision)));
+}
+
+/**
+ * Helper function to make count pow tick marks on domain lo to hi.
+ * Uses d3-scale to do so.
+ * Coerces tick number[] to Tick[].
+ *
+ * @export
+ * @param {number} lo
+ * @param {number} hi
+ * @param {number} precision
+ * @param {boolean} nice
+ * @param {number} exponent
+ * @returns {Tick[]}
+ */
+export function getPowTicks(lo: number,
+                            hi: number,
+                            precision: number,
+                            nice: boolean,
+                            exponent: number): Tick[] {
+  let scale = d3Scale.scalePow()
+                     .exponent(exponent)
+                     .domain([lo, hi]);
 
   if (nice) {
     scale = scale.nice();
@@ -129,19 +160,21 @@ export function getRandomPositions(count: number): any {
 
 /**
  * Gets ticks by type.
- * Supported types are linear and log.
+ * Supported types are linear, log, and pow.
  *
  * @export
  * @param {Trace[]} traces
  * @param {string} type
  * @param {number} precision
  * @param {boolean} nice
+ * @param {number} exponent
  * @returns {TickListPair}
  */
 export function getTicks(traces: Trace[],
                          type: string,
                          precision: number,
-                         nice: boolean): TickListPair {
+                         nice: boolean,
+                         exponent: number): TickListPair {
   const minMax = getMinMax(traces);
 
   let xTicks: Tick[] = [];
@@ -154,6 +187,10 @@ export function getTicks(traces: Trace[],
   else if (type === 'log') {
     xTicks = getLogTicks(minMax.p1.x, minMax.p2.x, precision, nice);
     yTicks = getLogTicks(minMax.p1.y, minMax.p2.y, precision, nice);
+  }
+  else if (type === 'pow') {
+    xTicks = getPowTicks(minMax.p1.x, minMax.p2.x, precision, nice, exponent);
+    yTicks = getPowTicks(minMax.p1.y, minMax.p2.y, precision, nice, exponent);
   }
 
   return new TickListPair(xTicks, yTicks);

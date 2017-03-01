@@ -10,19 +10,6 @@ class App extends Component {
     glPlot2d.defineGlPlot2d('gl-plot-2d');
   }
 
-  componentWillMount() {
-    // TODO: Unique event names!
-    document.addEventListener('gl-plot-2d-init-plot-done', () => {
-      if (this.glPlot2dComponent1.plot) {
-        this.glPlot2dComponent1.drawPlot();
-      }
-
-      if (this.glPlot2dComponent2.plot) {
-        this.glPlot2dComponent2.drawPlot();
-      }
-    });
-  }
-
   makePlot1() {
     const p1 = glPlot2d.getRandomPositions(1000);
     const p2 = glPlot2d.getRandomPositions(100);
@@ -53,17 +40,18 @@ class App extends Component {
       }
     };
 
+    this.name1 = 'plot1';
     this.traces1 = [trace1, trace2];
     this.debug1 = true;
-    this.height1 = '300px';
+    this.height1 = '200px';
     this.width1 = '100%';
 
-    const tickList = glPlot2d.getTicks(this.traces1, 'linear', 1, true);
+    const tickList = glPlot2d.getTicks(this.traces1, 'linear', 1, true, null);
 
     this.plotOptions1 = {
       pixelRatio: 1,
       screenBox: null,
-      dataBox: [tickList.t1[0].x - 0.25, tickList.t2[0].x - 0.25, tickList.t1[tickList.t1.length - 1].x + 0.25, tickList.t2[tickList.t2.length - 1].x + 0.25],
+      dataBox: [tickList.t1[0].x - 0.25, tickList.t2[0].x - 0.5, tickList.t1[tickList.t1.length - 1].x + 0.25, tickList.t2[tickList.t2.length - 1].x + 0.5],
       viewBox: null,
       titleEnabe: false,
       title: '',
@@ -101,6 +89,7 @@ class App extends Component {
     }
 
     props(this.glPlot2dComponent1, {
+      name: this.name1,
       traces: this.traces1,
       debug: this.debug1,
       height: this.height1,
@@ -110,8 +99,8 @@ class App extends Component {
   }
 
   makePlot2() {
-    const p3 = glPlot2d.getRandomPositions(1000);
-    const p4 = glPlot2d.getRandomPositions(100);
+    const p3 = glPlot2d.getRandomPositions(100);
+    const p4 = glPlot2d.getRandomPositions(1000);
 
     const trace3 = {
       mode: 'line',
@@ -139,17 +128,18 @@ class App extends Component {
       }
     };
 
+    this.name2 = 'plot2';
     this.traces2 = [trace3, trace4];
     this.debug2 = true;
-    this.height2 = '300px';
+    this.height2 = '200px';
     this.width2 = '100%';
 
-    const tickList = glPlot2d.getTicks(this.traces1, 'log', 1, false);
+    const tickList = glPlot2d.getTicks(this.traces1, 'log', 1, true, null);
 
     this.plotOptions2 = {
       pixelRatio: 1,
       screenBox: null,
-      dataBox: [tickList.t1[0].x - 0.25, tickList.t2[0].x - 0.25, tickList.t1[tickList.t1.length - 1].x + 0.25, tickList.t2[tickList.t2.length - 1].x + 0.25],
+      dataBox: [tickList.t1[0].x - 0.25, tickList.t2[0].x - 0.5, tickList.t1[tickList.t1.length - 1].x + 0.25, tickList.t2[tickList.t2.length - 1].x + 0.5],
       viewBox: null,
       titleEnabe: false,
       title: '',
@@ -187,6 +177,7 @@ class App extends Component {
     }
 
     props(this.glPlot2dComponent2, {
+      name: this.name2,
       traces: this.traces2,
       debug: this.debug2,
       height: this.height2,
@@ -198,36 +189,25 @@ class App extends Component {
   componentDidMount() {
     this.makePlot1();
     this.makePlot2();
+    window.dispatchEvent(new Event('resize'));
   }
 
   render() {
-    let outerContainer = {
+    const outerContainer = {
       width: '100%'
     };
 
-    let innerContainer = {
+    const innerContainer = {
       paddingBottom: '0.5px'
     };
 
     return (
       <div style={outerContainer}>
         <div style={innerContainer}>
-          <gl-plot-2d
-            ref={(glPlot2dComponent1) => { this.glPlot2dComponent1 = glPlot2dComponent1 }}
-            traces={this.traces1}
-            debug={this.debug1}
-            height={this.height1}
-            width={this.width1}
-            plotOptions={this.plotOptions1} />
+          <gl-plot-2d ref={(glPlot2dComponent1) => { this.glPlot2dComponent1 = glPlot2dComponent1 }}/>
         </div>
         <div style={innerContainer}>
-          <gl-plot-2d
-            ref={(glPlot2dComponent2) => { this.glPlot2dComponent2 = glPlot2dComponent2 }}
-            traces={this.traces2}
-            debug={this.debug2}
-            height={this.height2}
-            width={this.width2}
-            plotOptions={this.plotOptions2} />
+          <gl-plot-2d ref={(glPlot2dComponent2) => { this.glPlot2dComponent2 = glPlot2dComponent2 }} />
         </div>
       </div>
     );

@@ -34,7 +34,7 @@ export class ScatterFancy {
   }
 
   /**
-   * Updates colors array to a given colors via a pointId.
+   * Updates colors array to a given color via a pointId.
    *
    * @param {number} pointId
    * @param {number[]} color

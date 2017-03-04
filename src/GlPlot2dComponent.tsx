@@ -21,8 +21,8 @@ import { GlPlot2dComponentProps,
  * @extends {skate.Component<GlPlot2dComponentProps>}
  */
 export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
-  private gl: WebGLRenderingContext | null;   // WebGL Context.
   private canvas: HTMLCanvasElement | null;   // Canvas element we render to.
+  private gl: WebGLRenderingContext | null;   // WebGL Context.
   private plot: any | null;                   // Plot object via gl-plot2d.
   private spikes: any | null;                 // Spikes object via gl-spikes2d.
 
@@ -152,11 +152,16 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
 
   /**
    * Function that is called after the element has been removed from the document.
+   * Items are destroyed in the reverse-order from which they are initialized.
    *
    * @memberOf GlPlot2dComponent
    */
   public disconnectedCallback(): void {
     super.disconnectedCallback();
+
+    if (this.spikes) {
+      this.spikes.dispose();
+    }
 
     if (this.plot) {
       this.plot.dispose();

@@ -4,6 +4,7 @@ import * as fit from 'canvas-fit';
 import * as createLine from 'gl-line2d';
 import * as createPlot from 'gl-plot2d';
 import * as createScatter from 'gl-scatter2d';
+import * as createScatterFancy from 'gl-scatter2d-sdf';
 import * as createSpikes from 'gl-spikes2d';
 import { debounce } from 'lodash';
 
@@ -11,6 +12,7 @@ import { GlPlot2dComponentProps,
          GlPlot2dOptions,
          Line,
          Scatter,
+         ScatterFancy,
          Trace } from './';
 
 /**
@@ -48,7 +50,8 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
                              trace.min,
                              trace.max,
                              trace.line,
-                             trace.scatter);
+                             trace.scatter,
+                             trace.scatterFancy);
           });
         }
       }),
@@ -283,6 +286,9 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
       else if (trace.scatter) {
         this.addScatterPlot(trace.positions, trace.scatter);
       }
+      else if (trace.scatterFancy) {
+        this.addScatterFancyPlot(trace.positions, trace.scatterFancy);
+      }
     });
 
     skate.emit(this, `gl-plot-2d-init-plot-done-${this['name']}`);
@@ -343,6 +349,25 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
       color: scatter.color,
       borderSize: scatter.borderSize,
       borderColor: scatter.borderColor
+    });
+  }
+
+  /**
+   * Helper that adds a scatter fancy plot to the current plot.
+   *
+   * @param {number[]} positions
+   * @param {ScatterFancy} scatterFancy
+   *
+   * @memberOf GlPlot2dComponent
+   */
+  public addScatterFancyPlot(positions: number[], scatterFancy: ScatterFancy): void {
+    createScatterFancy(this.plot, {
+      positions: new Float32Array(positions),
+      sizes: scatterFancy.sizes,
+      colors: scatterFancy.colors,
+      glyphs: scatterFancy.glyphs,
+      borderWidths: scatterFancy.borderWidths,
+      borderColors: scatterFancy.borderColors
     });
   }
 

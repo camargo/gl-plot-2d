@@ -14,6 +14,7 @@ export {
   Point,
   PointPair,
   Scatter,
+  ScatterFancy,
   Tick,
   TickListPair,
   Trace

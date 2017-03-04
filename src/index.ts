@@ -6,6 +6,7 @@ export { Line } from './Line';
 export { Point } from './Point';
 export { PointPair } from './PointPair';
 export { Scatter } from './Scatter';
+export { ScatterFancy } from './ScatterFancy';
 export { Tick } from './Tick';
 export { TickListPair } from './TickListPair';
 export { Trace } from './Trace';

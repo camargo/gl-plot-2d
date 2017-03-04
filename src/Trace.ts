@@ -1,4 +1,4 @@
-import { Line, Point, Scatter } from './';
+import { Line, Point, Scatter, ScatterFancy } from './';
 
 /**
  * Trace.
@@ -15,6 +15,7 @@ export class Trace {
   public max: Point;
   public line: Line | null;
   public scatter: Scatter | null;
+  public scatterFancy: ScatterFancy | null;
 
   /**
    * Creates an instance of Trace.
@@ -25,6 +26,7 @@ export class Trace {
    * @param {Point} max
    * @param {(Line | null)} line
    * @param {(Scatter | null)} scatter
+   * @param {(ScatterFancy | null)} scatterFancy
    *
    * @memberOf Trace
    */
@@ -33,7 +35,8 @@ export class Trace {
               min: Point,
               max: Point,
               line: Line | null,
-              scatter: Scatter | null) {
+              scatter: Scatter | null,
+              scatterFancy: ScatterFancy | null) {
     this.mode = mode;
     this.positions = positions;
     this.min = min;
@@ -51,6 +54,17 @@ export class Trace {
     }
     else {
       this.scatter = null;
+    }
+
+    if (scatterFancy) {
+      this.scatterFancy = new ScatterFancy(scatterFancy.sizes,
+                                           scatterFancy.colors,
+                                           scatterFancy.glyphs,
+                                           scatterFancy.borderWidths,
+                                           scatterFancy.borderColors);
+    }
+    else {
+      this.scatterFancy = null;
     }
   }
 }

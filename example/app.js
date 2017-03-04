@@ -11,7 +11,7 @@ class App extends Component {
   }
 
   makePlot1() {
-    const p1 = glPlot2d.getRandomPositions(1000);
+    const p1 = glPlot2d.getRandomPositions(100);
     const p2 = glPlot2d.getRandomPositions(100);
 
     const trace1 = {
@@ -111,7 +111,7 @@ class App extends Component {
         color: [0, 1, 0, 1],
         fill: [false, false, false, false],
         fillColor: [[0, 1, 0, 0.5], [0, 1, 0, 0.5], [0, 1, 0, 0.5], [0, 1, 0, 0.5]],
-        width: 2
+        width: 5
       }
     };
 
@@ -134,7 +134,7 @@ class App extends Component {
     this.height2 = '200px';
     this.width2 = '100%';
 
-    const tickList = glPlot2d.getTicks(this.traces1, 'log', 1, true, null);
+    const tickList = glPlot2d.getTicks(this.traces1, 'log', 1, false, null);
 
     this.plotOptions2 = {
       pixelRatio: 1,
@@ -168,7 +168,7 @@ class App extends Component {
       tickMarkWidth: [1, 1, 1, 1],
       tickMarkLength: [4, 4, 4, 4],
       tickMarkColor: [[0, 0, 0, 0], [0, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
-      gridLineEnable: [true, true],
+      gridLineEnable: [false, true],
       gridLineColor: [[0, 0, 0, 0.5], [0, 0, 0, 0.5]],
       gridLineWidth: [0.5, 0.5],
       zeroLineEnable: [false, false],

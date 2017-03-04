@@ -4,6 +4,7 @@ import * as fit from 'canvas-fit';
 import * as createLine from 'gl-line2d';
 import * as createPlot from 'gl-plot2d';
 import * as createScatter from 'gl-scatter2d';
+import * as createSpikes from 'gl-spikes2d';
 import { debounce } from 'lodash';
 
 import { GlPlot2dComponentProps,
@@ -23,6 +24,7 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
   private gl: WebGLRenderingContext | null;   // WebGL Context.
   private canvas: HTMLCanvasElement | null;   // Canvas element we render to.
   private plot: any | null;                   // Plot object via gl-plot2d.
+  private spikes: any | null;                 // Spikes object via gl-spikes2d.
 
   /**
    * Custom properties that should be defined on the element. These are set up in the constructor.
@@ -94,7 +96,25 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
   public renderedCallback(): void {
     if (this.shadowRoot && !this.canvas && !this.plot) {
       this.canvas = this.shadowRoot.querySelector('canvas');
-      this.initResizeEvents();
+
+      if (this.canvas) {
+        this.gl = this.canvas.getContext('webgl');
+      }
+      else {
+        if (this['debug']) {
+          console.error('GlPlot2dComponent: initAndDrawPlot: No canvas: ', this.canvas);
+        }
+        return;
+      }
+
+      if (!this.gl) {
+        if (this['debug']) {
+          console.error('GlPlot2dComponent: initAndDrawPlot: No gl: ', this.gl);
+        }
+        return;
+      }
+
+      this.initEventHandlers();
       this.initPlot();
       this.fitCanvas();
       this.drawPlot();
@@ -140,6 +160,14 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
 
     if (this.plot) {
       this.plot.dispose();
+    }
+
+    if (this.gl) {
+      this.gl = null;
+    }
+
+    if (this.canvas) {
+      this.canvas = null;
     }
   }
 
@@ -193,12 +221,12 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
   }
 
   /**
-   * Helper function that initializes resize events.
+   * Helper function that initializes event handlers.
    * Should be only called once on component initialization.
    *
    * @memberOf GlPlot2dComponent
    */
-  public initResizeEvents(): void {
+  public initEventHandlers(): void {
     // Debounce the resize call.
     const debounceResize = debounce(() => {
       this.fitCanvas();
@@ -207,6 +235,28 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
 
     // Setup debounced window resize event listener.
     window.addEventListener('resize', debounceResize, false);
+
+    // Register canvas interaction events.
+    if (this.canvas) {
+      this.canvas.onmousedown = (event: MouseEvent) => {
+        this.onMouseDown(event);
+      };
+
+      this.canvas.onmouseup = () => {
+        // console.info('onmouseup: ', event);
+        // TODO.
+      };
+
+      this.canvas.onmousemove = () => {
+        // console.info('onmousemove: ', event);
+        // TODO.
+      };
+
+      this.canvas.onmouseover = () => {
+        // console.info('onmouseover: ', event);
+        // TODO.
+      };
+    }
   }
 
   /**
@@ -217,25 +267,9 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
    * @memberOf GlPlot2dComponent
    */
   public initPlot(): void {
-    if (this.canvas) {
-      this.gl = this.canvas.getContext('webgl');
-    }
-    else {
-      if (this['debug']) {
-        console.error('GlPlot2dComponent: initAndDrawPlot: No canvas: ', this.canvas);
-      }
-      return;
-    }
-
-    if (!this.gl) {
-      if (this['debug']) {
-        console.error('GlPlot2dComponent: initAndDrawPlot: No gl: ', this.gl);
-      }
-      return;
-    }
-
     this['plotOptions'].gl = this.gl;
     this.plot = createPlot(this['plotOptions']);
+    this.spikes = createSpikes(this.plot);
 
     this['traces'].forEach((trace: Trace) => {
       if (trace.line) {
@@ -305,6 +339,33 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
       borderSize: scatter.borderSize,
       borderColor: scatter.borderColor
     });
+  }
+
+  /**
+   * Event handler helper for mouse down event.
+   *
+   * @private
+   * @param {MouseEvent} event
+   *
+   * @memberOf GlPlot2dComponent
+   */
+  private onMouseDown(event: MouseEvent): void  {
+    if (this. canvas) {
+      const canvasBoundingRect = this.canvas.getBoundingClientRect();
+      const x = event.clientX - canvasBoundingRect.left;
+      const y = Math.abs(event.clientY - canvasBoundingRect.top - canvasBoundingRect.height);
+
+      const result = this.plot.pick(x / this.plot.pixelRatio, y / this.plot.pixelRatio);
+
+      if (result) {
+        this.spikes.update({ center: result.dataCoord });
+      }
+      else {
+        this.spikes.update();
+      }
+
+      this.drawPlot();
+    }
   }
 }
 

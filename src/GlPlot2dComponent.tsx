@@ -25,7 +25,7 @@ import { GlPlot2dComponentProps,
 export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
   private canvas: HTMLCanvasElement | null;   // Canvas element we render to.
   private gl: WebGLRenderingContext | null;   // WebGL Context.
-  private plot: any | null;                   // Plot object via gl-plot2d.
+  private plot: GLPlot2D | null;              // Plot object via gl-plot2d.
   private spikes: any | null;                 // Spikes object via gl-spikes2d.
 
   /**
@@ -233,17 +233,14 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
       };
 
       this.canvas.onmouseup = () => {
-        // console.info('onmouseup: ', event);
         // TODO.
       };
 
       this.canvas.onmousemove = () => {
-        // console.info('onmousemove: ', event);
         // TODO.
       };
 
       this.canvas.onmouseover = () => {
-        // console.info('onmouseover: ', event);
         // TODO.
       };
     }
@@ -309,20 +306,25 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
    * @memberOf GlPlot2dComponent
    */
   public drawPlot(): void {
-    // Make sure plot is updated with current plotOptions before drawing.
-    this.plot.update(this['plotOptions']);
+    if (this.plot) {
+      // Make sure plot is updated with current plotOptions before drawing.
+      this.plot.update(this['plotOptions']);
 
-    if (this['debug']) {
-      console.time('drawTime');
+      if (this['debug']) {
+        console.time('drawTime');
+      }
+
+      this.plot.draw();
+
+      if (this['debug']) {
+        console.timeEnd('drawTime');
+      }
+
+      skate.emit(this, `gl-plot-2d-draw-plot-done-${this['name']}`);
     }
-
-    this.plot.draw();
-
-    if (this['debug']) {
-      console.timeEnd('drawTime');
+    else if (this['debug']) {
+      console.error('GlPlot2dComponent: drawPlot: no plot object: ', this.plot);
     }
-
-    skate.emit(this, `gl-plot-2d-draw-plot-done-${this['name']}`);
   }
 
   /**
@@ -367,7 +369,7 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
    * @memberOf GlPlot2dComponent
    */
   private onMouseDown(event: MouseEvent): void  {
-    if (this. canvas) {
+    if (this.canvas && this.plot) {
       const canvasBoundingRect = this.canvas.getBoundingClientRect();
       const x = event.clientX - canvasBoundingRect.left;
       const y = Math.abs(event.clientY - canvasBoundingRect.top - canvasBoundingRect.height);
@@ -376,14 +378,6 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
 
       if (result) {
         this.spikes.update({ center: result.dataCoord });
-
-        // Select point by changing it's color.
-        this['traces'].forEach((trace: Trace) => {
-          if (trace.scatterFancy) {
-            trace.scatterFancy.selectByPointId(result.pointId, [1.0, 1.0, 0.0, 1.0]);
-            result.object.update(trace.scatterFancy);
-          }
-        });
       }
       else {
         this.spikes.update();

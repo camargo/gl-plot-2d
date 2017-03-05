@@ -62,7 +62,8 @@ export class Trace {
                                            scatterFancy.colors,
                                            scatterFancy.glyphs,
                                            scatterFancy.borderWidths,
-                                           scatterFancy.borderColors);
+                                           scatterFancy.borderColors,
+                                           scatterFancy.selected);
     }
     else {
       this.scatterFancy = null;

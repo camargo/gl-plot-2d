@@ -333,13 +333,7 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
    * @memberOf GlPlot2dComponent
    */
   public addLinePlot(line: Line): void {
-    createLine(this.plot, {
-      positions: line.positions,
-      color: line.color,
-      fill: line.fill,
-      fillColor: line.fillColor,
-      width: line.width
-    });
+    createLine(this.plot, line);
   }
 
   /**
@@ -350,13 +344,7 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
    * @memberOf GlPlot2dComponent
    */
   public addScatterPlot(scatter: Scatter): void {
-    createScatter(this.plot, {
-      positions: scatter.positions,
-      size: scatter.size,
-      color: scatter.color,
-      borderSize: scatter.borderSize,
-      borderColor: scatter.borderColor
-    });
+    createScatter(this.plot, scatter);
   }
 
   /**
@@ -367,14 +355,7 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
    * @memberOf GlPlot2dComponent
    */
   public addScatterFancyPlot(scatterFancy: ScatterFancy): void {
-    createScatterFancy(this.plot, {
-      positions: scatterFancy.positions,
-      sizes: scatterFancy.sizes,
-      colors: scatterFancy.colors,
-      glyphs: scatterFancy.glyphs,
-      borderWidths: scatterFancy.borderWidths,
-      borderColors: scatterFancy.borderColors
-    });
+    createScatterFancy(this.plot, scatterFancy);
   }
 
   /**
@@ -395,6 +376,14 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
 
       if (result) {
         this.spikes.update({ center: result.dataCoord });
+
+        // Select point by changing it's color.
+        this['traces'].forEach((trace: Trace) => {
+          if (trace.scatterFancy) {
+            trace.scatterFancy.selectByPointId(result.pointId, [1.0, 1.0, 0.0, 1.0]);
+            result.object.update(trace.scatterFancy);
+          }
+        });
       }
       else {
         this.spikes.update();

@@ -2,10 +2,13 @@
 /**
  * Scatter.
  *
+ * See https://github.com/gl-vis/gl-scatter2d.
+ *
  * @export
  * @class Scatter
  */
 export class Scatter {
+  public positions: number[];
   public size: number;
   public color: number[];
   public borderSize: number;
@@ -14,6 +17,7 @@ export class Scatter {
   /**
    * Creates an instance of Scatter.
    *
+   * @param {number[]} positions
    * @param {number} size
    * @param {number[]} color
    * @param {number} borderSize
@@ -21,7 +25,8 @@ export class Scatter {
    *
    * @memberOf Scatter
    */
-  constructor(size: number, color: number[], borderSize: number, borderColor: number[]) {
+  constructor(positions: number[], size: number, color: number[], borderSize: number, borderColor: number[]) {
+    this.positions = positions;
     this.size = size;
     this.color = color;
     this.borderSize = borderSize;

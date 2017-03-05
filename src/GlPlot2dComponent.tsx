@@ -46,7 +46,6 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
           // Turn (or "coerce") each trace into a Trace object.
           return traces.map((trace: Trace) => {
             return new Trace(trace.mode,
-                             trace.positions,
                              trace.min,
                              trace.max,
                              trace.line,
@@ -100,23 +99,7 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
     if (this.shadowRoot && !this.canvas && !this.plot) {
       this.canvas = this.shadowRoot.querySelector('canvas');
 
-      if (this.canvas) {
-        this.gl = this.canvas.getContext('webgl');
-      }
-      else {
-        if (this['debug']) {
-          console.error('GlPlot2dComponent: initAndDrawPlot: No canvas: ', this.canvas);
-        }
-        return;
-      }
-
-      if (!this.gl) {
-        if (this['debug']) {
-          console.error('GlPlot2dComponent: initAndDrawPlot: No gl: ', this.gl);
-        }
-        return;
-      }
-
+      this.initGl();
       this.initEventHandlers();
       this.initPlot();
       this.fitCanvas();
@@ -202,30 +185,29 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
   }
 
   /**
-   * Resize fit canvas function that uses canvas-fit.
-   * Sets the viewBox to contain the entire surrounding div.
+   * Helper to initialize WebGL context.
+   *
+   * @returns {void}
    *
    * @memberOf GlPlot2dComponent
    */
-  public fitCanvas(): void {
-    // Setup fit().
-    const resize = fit(this.canvas, null, +window.devicePixelRatio);
-
-    if (this.shadowRoot) {
-      // Get the div around the canvas.
-      const div = this.shadowRoot.querySelector('div');
-
-      if (div) {
-        const boundingClientRect = div.getBoundingClientRect();
-
-        // Set the viewBox to contain the entire surrounding div.
-        // TODO: Parameterize the viewBox.
-        this['plotOptions'].viewBox = [50, 1, boundingClientRect.width - 1, boundingClientRect.height - 1];
+  public initGl(): void {
+    if (this.canvas) {
+      this.gl = this.canvas.getContext('webgl');
+    }
+    else {
+      if (this['debug']) {
+        console.error('GlPlot2dComponent: initGl: No canvas: ', this.canvas);
       }
+      return;
     }
 
-    // Trigger resize.
-    resize();
+    if (!this.gl) {
+      if (this['debug']) {
+        console.error('GlPlot2dComponent: initGl: No gl: ', this.gl);
+      }
+      return;
+    }
   }
 
   /**
@@ -281,17 +263,44 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
 
     this['traces'].forEach((trace: Trace) => {
       if (trace.line) {
-        this.addLinePlot(trace.positions, trace.line);
+        this.addLinePlot(trace.line);
       }
       else if (trace.scatter) {
-        this.addScatterPlot(trace.positions, trace.scatter);
+        this.addScatterPlot(trace.scatter);
       }
       else if (trace.scatterFancy) {
-        this.addScatterFancyPlot(trace.positions, trace.scatterFancy);
+        this.addScatterFancyPlot(trace.scatterFancy);
       }
     });
 
     skate.emit(this, `gl-plot-2d-init-plot-done-${this['name']}`);
+  }
+
+  /**
+   * Resize fit canvas function that uses canvas-fit.
+   * Sets the viewBox to contain the entire surrounding div.
+   *
+   * @memberOf GlPlot2dComponent
+   */
+  public fitCanvas(): void {
+    // Setup fit().
+    const resize = fit(this.canvas, null, +window.devicePixelRatio);
+
+    if (this.shadowRoot) {
+      // Get the div around the canvas.
+      const div = this.shadowRoot.querySelector('div');
+
+      if (div) {
+        const boundingClientRect = div.getBoundingClientRect();
+
+        // Set the viewBox to contain the entire surrounding div.
+        // TODO: Parameterize the viewBox.
+        this['plotOptions'].viewBox = [50, 1, boundingClientRect.width - 1, boundingClientRect.height - 1];
+      }
+    }
+
+    // Trigger resize.
+    resize();
   }
 
   /**
@@ -319,14 +328,13 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
   /**
    * Helper that adds a line plot to the current plot.
    *
-   * @param {number[]} positions
    * @param {Line} line
    *
    * @memberOf GlPlot2dComponent
    */
-  public addLinePlot(positions: number[], line: Line): void {
+  public addLinePlot(line: Line): void {
     createLine(this.plot, {
-      positions: new Float32Array(positions),
+      positions: line.positions,
       color: line.color,
       fill: line.fill,
       fillColor: line.fillColor,
@@ -337,14 +345,13 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
   /**
    * Helper that adds a scatter plot to the current plot.
    *
-   * @param {number[]} positions
    * @param {Scatter} scatter
    *
    * @memberOf GlPlot2dComponent
    */
-  public addScatterPlot(positions: number[], scatter: Scatter): void {
+  public addScatterPlot(scatter: Scatter): void {
     createScatter(this.plot, {
-      positions: new Float32Array(positions),
+      positions: scatter.positions,
       size: scatter.size,
       color: scatter.color,
       borderSize: scatter.borderSize,
@@ -355,14 +362,13 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
   /**
    * Helper that adds a scatter fancy plot to the current plot.
    *
-   * @param {number[]} positions
    * @param {ScatterFancy} scatterFancy
    *
    * @memberOf GlPlot2dComponent
    */
-  public addScatterFancyPlot(positions: number[], scatterFancy: ScatterFancy): void {
+  public addScatterFancyPlot(scatterFancy: ScatterFancy): void {
     createScatterFancy(this.plot, {
-      positions: new Float32Array(positions),
+      positions: scatterFancy.positions,
       sizes: scatterFancy.sizes,
       colors: scatterFancy.colors,
       glyphs: scatterFancy.glyphs,

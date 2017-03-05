@@ -8,6 +8,7 @@
  * @class ScatterFancy
  */
 export class ScatterFancy {
+  public positions: number[];
   public sizes: number[];
   public colors: number[];
   public glyphs: string[];
@@ -17,6 +18,7 @@ export class ScatterFancy {
   /**
    * Creates an instance of ScatterFancy.
    *
+   * @param {number[]} positions
    * @param {number[]} sizes
    * @param {number[]} colors
    * @param {string[]} glyphs
@@ -25,7 +27,13 @@ export class ScatterFancy {
    *
    * @memberOf ScatterFancy
    */
-  constructor(sizes: number[], colors: number[], glyphs: string[], borderWidths: number[], borderColors: number[]) {
+  constructor(positions: number[],
+              sizes: number[],
+              colors: number[],
+              glyphs: string[],
+              borderWidths: number[],
+              borderColors: number[]) {
+    this.positions = positions;
     this.sizes = sizes;
     this.colors = colors;
     this.glyphs = glyphs;

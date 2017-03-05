@@ -7,6 +7,8 @@ export {
   GlPlot2dOptions,
   getLinearTicks,
   getLogTicks,
+  getMin,
+  getMax,
   getMinMax,
   getRandomPositions,
   getTicks,

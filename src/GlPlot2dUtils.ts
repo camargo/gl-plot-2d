@@ -123,39 +123,67 @@ export function getMinMax(traces: Trace[]): PointPair {
 }
 
 /**
- * Helper that gets random positions.
- * Also returns min and max coordinates from positions: (minX, minY) and (maxX, maxY).
+ * Helper that gets random positions for testing purposes.
  *
  * @export
  * @param {number} count
- * @returns {*}
+ * @param {number} xRange
+ * @returns {number[]}
  */
-export function getRandomPositions(count: number): any {
+export function getRandomPositions(count: number, xRange: number): number[] {
   const positions: number[] = [];
-  let minX = Number.MAX_SAFE_INTEGER;
-  let minY = Number.MAX_SAFE_INTEGER;
-  let maxX = Number.MIN_SAFE_INTEGER;
-  let maxY = Number.MIN_SAFE_INTEGER;
 
   for (let i = 0; i < 2 * count; i += 2) {
-    positions[i] = (i / count) * 20 - 20;
+    positions[i] = (i / count) * xRange - xRange;
 
     // Samples the standard normal distribution, with 0 mean and unit standard deviation.
     // See https://github.com/scijs/gauss-random.
     positions[i + 1] = Math.sqrt(-2.0 * Math.log(Math.random())) * Math.cos(2.0 * Math.PI * Math.random());
+  }
 
+  return positions;
+}
+
+/**
+ * Get a min point out of a list of positions.
+ * Assumes (x, y) values are packed in a single positions array such that
+ * x === positions[i] and y === positions[i + 1].
+ *
+ * @export
+ * @param {number[]} positions
+ * @returns {Point}
+ */
+export function getMin(positions: number[]): Point {
+  let minX = Number.MAX_SAFE_INTEGER;
+  let minY = Number.MAX_SAFE_INTEGER;
+
+  for (let i = 0; i < positions.length; i += 2) {
     if (positions[i] < minX) { minX = positions[i]; }
     if (positions[i + 1] < minY) { minY = positions[i + 1]; }
+  }
 
+  return new Point(minX, minY);
+}
+
+/**
+ * Get a max point out of a list of positions.
+ * Assumes (x, y) values are packed in a single positions array such that
+ * x === positions[i] and y === positions[i + 1].
+ *
+ * @export
+ * @param {number[]} positions
+ * @returns {Point}
+ */
+export function getMax(positions: number[]): Point {
+  let maxX = Number.MIN_SAFE_INTEGER;
+  let maxY = Number.MIN_SAFE_INTEGER;
+
+  for (let i = 0; i < positions.length; i += 2) {
     if (positions[i] > maxX) { maxX = positions[i]; }
     if (positions[i + 1] > maxY) { maxY = positions[i + 1]; }
   }
 
-  return {
-    positions,
-    min: new Point(minX, minY),
-    max: new Point(maxX, maxY)
-  };
+  return new Point(maxX, maxY);
 }
 
 /**

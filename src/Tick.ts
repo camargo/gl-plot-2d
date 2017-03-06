@@ -23,4 +23,15 @@ export class Tick {
     this.x = x;
     this.text = x.toString();
   }
+
+  /**
+   * Convenience method to get x.
+   *
+   * @returns {number}
+   *
+   * @memberOf Tick
+   */
+  public tick(): number {
+    return this.x;
+  }
 }

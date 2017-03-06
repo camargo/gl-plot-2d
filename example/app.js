@@ -6,11 +6,11 @@ import { first, last } from 'lodash';
 import {
   defineGlPlot2d,
   makeRandomPositions,
+  getAxesTicks,
   getMinFromPositions,
   getMaxFromPositions,
   getMinFromPoints,
   getMaxFromPoints,
-  getTicks,
 } from 'gl-plot-2d';
 
 class App extends Component {
@@ -52,24 +52,24 @@ class App extends Component {
     const max = getMaxFromPositions(p1Positions);
     this.line1 = {
       positions: p1Positions,
-      color: [0, 1, 0, 1],
-      fill: [false, true, false, false],
-      fillColor: [[0, 0, 1, 0.5], [0, 0, 1, 0.5], [0, 0, 1, 0.5], [0, 0, 1, 0.5]],
-      width: 1
+      color: [0, 0, 1, 1],
+      fill: [false, true, false, true],
+      fillColor: [[0, 0, 1, 0.5], [0, 0, 1, 0.5], [0, 0, 1, 0.5], [1, 0.5, 0, 0.5]],
+      width: 2
     };
 
-    // Ticks.
-    const tickList = getTicks({ p1: min, p2: max }, 'linear', 1, true);
+    // Axes Ticks.
+    const axes = getAxesTicks('linear', min, max, 1, true);
 
     // Options.
     this.plotOptions1 = {
       pixelRatio: 1,
       screenBox: null,
       dataBox: [
-        first(tickList.t1).x,
-        first(tickList.t2).x - 0.5,
-        last(tickList.t1).x,
-        last(tickList.t2).x + 0.5
+        first(axes.x).tick(),
+        first(axes.y).tick() - 0.5,
+        last(axes.x).tick(),
+        last(axes.y).tick() + 0.5
       ],
       viewBox: null,
       titleEnabe: false,
@@ -91,7 +91,7 @@ class App extends Component {
       labelSize: [24, 24],
       labelFont: ["sans-serif", "sans-serif"],
       labelColor: [[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
-      ticks: [tickList.t1, tickList.t2],
+      ticks: [axes.x, axes.y],
       tickEnable: [false, true, false, false],
       tickPad: [20, 20, 0, 0],
       tickAngle: [0, 0, 0, 0],
@@ -147,20 +147,21 @@ class App extends Component {
       borderColor: [0, 0, 0, 1]
     };
 
-    // Ticks.
+    // Axes Ticks.
     const min = getMinFromPoints([min3, min4]);
     const max = getMaxFromPoints([max3, max4]);
-    const tickList = getTicks({ p1: min, p2: max }, 'linear', 1, false);
+    const axes = getAxesTicks('linear', min, max, 1, false);
+
 
     // Options.
     this.plotOptions2 = {
       pixelRatio: 1,
       screenBox: null,
       dataBox: [
-        first(tickList.t1).x,
-        first(tickList.t2).x - 0.5,
-        last(tickList.t1).x,
-        last(tickList.t2).x + 0.5
+        first(axes.x).tick(),
+        first(axes.y).tick() - 0.5,
+        last(axes.x).tick(),
+        last(axes.y).tick() + 0.5
       ],
       viewBox: null,
       titleEnabe: false,
@@ -182,7 +183,7 @@ class App extends Component {
       labelSize: [24, 24],
       labelFont: ["sans-serif", "sans-serif"],
       labelColor: [[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
-      ticks: [tickList.t1, tickList.t2],
+      ticks: [axes.x, axes.y],
       tickEnable: [false, true, false, false],
       tickPad: [20, 20, 0, 0],
       tickAngle: [0, 0, 0, 0],

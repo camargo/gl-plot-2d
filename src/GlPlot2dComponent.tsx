@@ -8,11 +8,13 @@ import * as createScatterFancy from 'gl-scatter2d-sdf';
 import * as createSpikes from 'gl-spikes2d';
 import { debounce } from 'lodash';
 
-import { GlPlot2dComponentProps,
-         GlPlot2dOptions,
-         Line,
-         Scatter,
-         ScatterFancy } from './';
+import {
+  GlPlot2dComponentProps,
+  GlPlot2dOptions,
+  Line,
+  Scatter,
+  ScatterFancy
+} from './';
 
 /**
  * GlPlot2dComponent class.

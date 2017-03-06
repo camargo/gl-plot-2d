@@ -1,10 +1,11 @@
 import * as d3Scale from 'd3-scale';
 import { round } from 'lodash';
 
-import { Point,
-         PointPair,
-         Tick,
-         TickListPair } from './';
+import {
+  Axes,
+  Point,
+  Tick
+} from './';
 
 /**
  * Helper function to make count linear tick marks on domain lo to hi.
@@ -177,31 +178,33 @@ export function getMaxFromPositions(positions: number[]): Point {
 }
 
 /**
- * Gets ticks by type.
+ * Gets ticks by type for x and y Axes.
  * Supported types are linear, log, and pow.
  *
  * @export
- * @param {PointPair} minMax
  * @param {string} type
+ * @param {Point} min
+ * @param {Point} max
  * @param {number} precision
  * @param {boolean} nice
- * @returns {TickListPair}
+ * @returns {Axes}
  */
-export function getTicks(minMax: PointPair,
-                         type: string,
-                         precision: number,
-                         nice: boolean): TickListPair {
+export function getAxesTicks(type: string,
+                             min: Point,
+                             max: Point,
+                             precision: number,
+                             nice: boolean): Axes {
   let xTicks: Tick[] = [];
   let yTicks: Tick[] = [];
 
   if (type === 'linear') {
-    xTicks = getLinearTicks(minMax.p1.x, minMax.p2.x, precision, nice);
-    yTicks = getLinearTicks(minMax.p1.y, minMax.p2.y, precision, nice);
+    xTicks = getLinearTicks(min.x, max.x, precision, nice);
+    yTicks = getLinearTicks(min.y, max.y, precision, nice);
   }
   else if (type === 'log') {
-    xTicks = getLogTicks(minMax.p1.x, minMax.p2.x, precision, nice);
-    yTicks = getLogTicks(minMax.p1.y, minMax.p2.y, precision, nice);
+    xTicks = getLogTicks(min.x, max.x, precision, nice);
+    yTicks = getLogTicks(min.y, max.y, precision, nice);
   }
 
-  return new TickListPair(xTicks, yTicks);
+  return new Axes(xTicks, yTicks);
 }

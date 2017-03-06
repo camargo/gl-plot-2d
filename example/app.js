@@ -3,22 +3,32 @@ import { render } from 'react-dom';
 import { props } from 'skatejs';
 import { first, last } from 'lodash';
 
-import * as glPlot2d from 'gl-plot-2d';
+import {
+  defineGlPlot2d,
+  makeRandomPositions,
+  getMinFromPositions,
+  getMaxFromPositions,
+  getMinFromPoints,
+  getMaxFromPoints,
+  getTicks,
+} from 'gl-plot-2d';
 
 class App extends Component {
   constructor() {
     super();
-    glPlot2d.defineGlPlot2d('gl-plot-2d');
+    defineGlPlot2d();
   }
 
   componentWillMount() {
     document.addEventListener('gl-plot-2d-init-plot-done-plot1', (event) => {
       this.glPlot2dComponent1.addLinePlot(this.line1);
+      this.glPlot2dComponent1.drawPlot();
     });
 
     document.addEventListener('gl-plot-2d-init-plot-done-plot2', () => {
       this.glPlot2dComponent2.addLinePlot(this.line2);
       this.glPlot2dComponent2.addScatterPlot(this.scatter1);
+      this.glPlot2dComponent2.drawPlot();
     });
   }
 
@@ -26,7 +36,8 @@ class App extends Component {
     this.makePlot1();
     this.makePlot2();
 
-    window.dispatchEvent(new Event('resize'));
+    // Might need to dispatch a resize if scroll-bar present in some browsers.
+    // window.dispatchEvent(new Event('resize'));
   }
 
   makePlot1() {
@@ -36,9 +47,9 @@ class App extends Component {
     this.width1 = '100%';
 
     // Line.
-    const p1Positions = glPlot2d.makeRandomPositions(1000, 10);
-    const min = glPlot2d.getMinFromPositions(p1Positions);
-    const max = glPlot2d.getMaxFromPositions(p1Positions);
+    const p1Positions = makeRandomPositions(1000, 20);
+    const min = getMinFromPositions(p1Positions);
+    const max = getMaxFromPositions(p1Positions);
     this.line1 = {
       positions: p1Positions,
       color: [0, 1, 0, 1],
@@ -48,7 +59,7 @@ class App extends Component {
     };
 
     // Ticks.
-    const tickList = glPlot2d.getTicks({ p1: min, p2: max }, 'linear', 1, true);
+    const tickList = getTicks({ p1: min, p2: max }, 'linear', 1, true);
 
     // Options.
     this.plotOptions1 = {
@@ -113,9 +124,9 @@ class App extends Component {
     this.width2 = '100%';
 
     // Line.
-    const p3Positions = glPlot2d.makeRandomPositions(1000, 20);
-    const min3 = glPlot2d.getMinFromPositions(p3Positions);
-    const max3 = glPlot2d.getMaxFromPositions(p3Positions);
+    const p3Positions = makeRandomPositions(1000, 20);
+    const min3 = getMinFromPositions(p3Positions);
+    const max3 = getMaxFromPositions(p3Positions);
     this.line2 = {
       positions: p3Positions,
       color: [0, 0, 1, 1],
@@ -125,9 +136,9 @@ class App extends Component {
     };
 
     // Scatter.
-    const p4Positions = glPlot2d.makeRandomPositions(100, 20);
-    const min4 = glPlot2d.getMinFromPositions(p4Positions);
-    const max4 = glPlot2d.getMaxFromPositions(p4Positions);
+    const p4Positions = makeRandomPositions(100, 20);
+    const min4 = getMinFromPositions(p4Positions);
+    const max4 = getMaxFromPositions(p4Positions);
     this.scatter1 = {
       positions: p4Positions,
       size: 10,
@@ -137,9 +148,9 @@ class App extends Component {
     };
 
     // Ticks.
-    const min = glPlot2d.getMinFromPoints([min3, min4]);
-    const max = glPlot2d.getMaxFromPoints([max3, max4]);
-    const tickList = glPlot2d.getTicks({ p1: min, p2: max }, 'linear', 1, false);
+    const min = getMinFromPoints([min3, min4]);
+    const max = getMaxFromPoints([max3, max4]);
+    const tickList = getTicks({ p1: min, p2: max }, 'linear', 1, false);
 
     // Options.
     this.plotOptions2 = {

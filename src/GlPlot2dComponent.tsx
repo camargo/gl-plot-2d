@@ -37,13 +37,10 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
    */
   static get props(): skate.ComponentProps<GlPlot2dComponent, GlPlot2dComponentProps> {
     return {
-      // Custom.
       name: skate.prop.string({ attribute: true }),
       debug: skate.prop.boolean({ attribute: true }),
       height: skate.prop.string({ attribute: true }),
       width: skate.prop.string({ attribute: true }),
-
-      // Specific to gl-plot2d.
       plotOptions: skate.prop.object<GlPlot2dComponent, GlPlot2dOptions>({ attribute: true })
     };
   }

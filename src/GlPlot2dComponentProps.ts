@@ -9,12 +9,9 @@ import { GlPlot2dOptions } from './';
  * @interface GlPlot2dComponentProps
  */
 export interface GlPlot2dComponentProps {
-  // Custom.
   name: string;
   debug: boolean;
   height: string;
   width: string;
-
-  // Specific to gl-plot2d.
-  plotOptions: GlPlot2dOptions;
+  plotOptions: GlPlot2dOptions; // Specific to gl-plot2d.
 }

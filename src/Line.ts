@@ -25,7 +25,11 @@ export class Line {
    *
    * @memberOf Line
    */
-  constructor(positions: number[], color: number[], fill: boolean[], fillColor: number[][], width: number) {
+  constructor(positions: number[],
+              color: number[],
+              fill: boolean[],
+              fillColor: number[][],
+              width: number) {
     this.positions = positions;
     this.color = color;
     this.fill = fill;

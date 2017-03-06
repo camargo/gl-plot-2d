@@ -1,7 +1,10 @@
 import * as d3Scale from 'd3-scale';
 import { round } from 'lodash';
 
-import { Point, PointPair, Tick, TickListPair, Trace } from './';
+import { Point,
+         PointPair,
+         Tick,
+         TickListPair } from './';
 
 /**
  * Helper function to make count linear tick marks on domain lo to hi.
@@ -64,73 +67,14 @@ export function getLogTicks(lo: number,
 }
 
 /**
- * Helper function to make count pow tick marks on domain lo to hi.
- * Uses d3-scale to do so.
- * Coerces tick number[] to Tick[].
- *
- * @export
- * @param {number} lo
- * @param {number} hi
- * @param {number} precision
- * @param {boolean} nice
- * @param {number} exponent
- * @returns {Tick[]}
- */
-export function getPowTicks(lo: number,
-                            hi: number,
-                            precision: number,
-                            nice: boolean,
-                            exponent: number): Tick[] {
-  let scale = d3Scale.scalePow()
-                     .exponent(exponent)
-                     .domain([lo, hi]);
-
-  if (nice) {
-    scale = scale.nice();
-  }
-
-  const ticks = scale.ticks();
-
-  return ticks.map((tick: number) => new Tick(round(tick, precision)));
-}
-
-/**
- * Helper function that finds global min and max points from a list of traces.
- *
- * @export
- * @param {Trace[]} traces
- * @returns {PointPair}
- */
-export function getMinMax(traces: Trace[]): PointPair {
-  let p1: Point = new Point(Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER);
-  let p2: Point = new Point(Number.MIN_SAFE_INTEGER, Number.MIN_SAFE_INTEGER);
-
-  if (traces.length > 1) {
-    traces.forEach((trace: Trace) => {
-      if (trace.min.x < p1.x) { p1.x = trace.min.x; }
-      if (trace.min.y < p1.y) { p1.y = trace.min.y; }
-
-      if (trace.max.x > p2.x) { p2.x = trace.max.x; }
-      if (trace.max.y > p2.y) { p2.y = trace.max.y; }
-    });
-  }
-  else if (traces.length === 1) {
-    p1 = traces[0].min;
-    p2 = traces[0].max;
-  }
-
-  return new PointPair(p1, p2);
-}
-
-/**
- * Helper that gets random positions for testing purposes.
+ * Helper that makes random positions for testing purposes.
  *
  * @export
  * @param {number} count
  * @param {number} xRange
  * @returns {number[]}
  */
-export function getRandomPositions(count: number, xRange: number): number[] {
+export function makeRandomPositions(count: number, xRange: number): number[] {
   const positions: number[] = [];
 
   for (let i = 0; i < 2 * count; i += 2) {
@@ -145,6 +89,52 @@ export function getRandomPositions(count: number, xRange: number): number[] {
 }
 
 /**
+ * Get a component-wise min point from a list of points.
+ *
+ * @export
+ * @param {Point[]} points
+ * @returns {Point}
+ */
+export function getMinFromPoints(points: Point[]): Point {
+  let min: Point = new Point(Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER);
+
+  if (points.length > 1) {
+    points.forEach((point: Point) => {
+      if (point.x < min.x) { min.x = point.x; }
+      if (point.y < min.y) { min.y = point.y; }
+    });
+  }
+  else if (points.length === 1) {
+    min = points[0];
+  }
+
+  return min;
+}
+
+/**
+ * Get a component-wise max point from a list of points.
+ *
+ * @export
+ * @param {Point[]} points
+ * @returns {Point}
+ */
+export function getMaxFromPoints(points: Point[]): Point {
+  let max: Point = new Point(Number.MIN_SAFE_INTEGER, Number.MIN_SAFE_INTEGER);
+
+  if (points.length > 1) {
+    points.forEach((point: Point) => {
+      if (point.x > max.x) { max.x = point.x; }
+      if (point.y > max.y) { max.y = point.y; }
+    });
+  }
+  else if (points.length === 1) {
+    max = points[0];
+  }
+
+  return max;
+}
+
+/**
  * Get a min point out of a list of positions.
  * Assumes (x, y) values are packed in a single positions array such that
  * x === positions[i] and y === positions[i + 1].
@@ -153,7 +143,7 @@ export function getRandomPositions(count: number, xRange: number): number[] {
  * @param {number[]} positions
  * @returns {Point}
  */
-export function getMin(positions: number[]): Point {
+export function getMinFromPositions(positions: number[]): Point {
   let minX = Number.MAX_SAFE_INTEGER;
   let minY = Number.MAX_SAFE_INTEGER;
 
@@ -174,7 +164,7 @@ export function getMin(positions: number[]): Point {
  * @param {number[]} positions
  * @returns {Point}
  */
-export function getMax(positions: number[]): Point {
+export function getMaxFromPositions(positions: number[]): Point {
   let maxX = Number.MIN_SAFE_INTEGER;
   let maxY = Number.MIN_SAFE_INTEGER;
 
@@ -191,20 +181,16 @@ export function getMax(positions: number[]): Point {
  * Supported types are linear, log, and pow.
  *
  * @export
- * @param {Trace[]} traces
+ * @param {PointPair} minMax
  * @param {string} type
  * @param {number} precision
  * @param {boolean} nice
- * @param {number} exponent
  * @returns {TickListPair}
  */
-export function getTicks(traces: Trace[],
+export function getTicks(minMax: PointPair,
                          type: string,
                          precision: number,
-                         nice: boolean,
-                         exponent: number): TickListPair {
-  const minMax = getMinMax(traces);
-
+                         nice: boolean): TickListPair {
   let xTicks: Tick[] = [];
   let yTicks: Tick[] = [];
 
@@ -215,10 +201,6 @@ export function getTicks(traces: Trace[],
   else if (type === 'log') {
     xTicks = getLogTicks(minMax.p1.x, minMax.p2.x, precision, nice);
     yTicks = getLogTicks(minMax.p1.y, minMax.p2.y, precision, nice);
-  }
-  else if (type === 'pow') {
-    xTicks = getPowTicks(minMax.p1.x, minMax.p2.x, precision, nice, exponent);
-    yTicks = getPowTicks(minMax.p1.y, minMax.p2.y, precision, nice, exponent);
   }
 
   return new TickListPair(xTicks, yTicks);

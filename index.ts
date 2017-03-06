@@ -7,17 +7,17 @@ export {
   GlPlot2dOptions,
   getLinearTicks,
   getLogTicks,
-  getMin,
-  getMax,
-  getMinMax,
-  getRandomPositions,
+  getMinFromPoints,
+  getMaxFromPoints,
+  getMinFromPositions,
+  getMaxFromPositions,
   getTicks,
+  makeRandomPositions,
   Line,
   Point,
   PointPair,
   Scatter,
   ScatterFancy,
   Tick,
-  TickListPair,
-  Trace
+  TickListPair
 } from './src';

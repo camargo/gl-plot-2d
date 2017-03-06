@@ -1,4 +1,4 @@
-import { GlPlot2dOptions, Trace } from './';
+import { GlPlot2dOptions } from './';
 
 /**
  * GlPlot2dComponentProps.
@@ -11,7 +11,6 @@ import { GlPlot2dOptions, Trace } from './';
 export interface GlPlot2dComponentProps {
   // Custom.
   name: string;
-  traces: Trace[];
   debug: boolean;
   height: string;
   width: string;

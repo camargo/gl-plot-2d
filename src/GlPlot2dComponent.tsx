@@ -12,8 +12,7 @@ import { GlPlot2dComponentProps,
          GlPlot2dOptions,
          Line,
          Scatter,
-         ScatterFancy,
-         Trace } from './';
+         ScatterFancy } from './';
 
 /**
  * GlPlot2dComponent class.
@@ -40,20 +39,6 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
     return {
       // Custom.
       name: skate.prop.string({ attribute: true }),
-      traces: skate.prop.array<GlPlot2dComponent, Trace>({
-        attribute: true,
-        coerce(traces) {
-          // Turn (or "coerce") each trace into a Trace object.
-          return traces.map((trace: Trace) => {
-            return new Trace(trace.mode,
-                             trace.min,
-                             trace.max,
-                             trace.line,
-                             trace.scatter,
-                             trace.scatterFancy);
-          });
-        }
-      }),
       debug: skate.prop.boolean({ attribute: true }),
       height: skate.prop.string({ attribute: true }),
       width: skate.prop.string({ attribute: true }),
@@ -101,9 +86,8 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
 
       this.initGl();
       this.initEventHandlers();
-      this.initPlot();
       this.fitCanvas();
-      this.drawPlot();
+      this.initPlot();
     }
   }
 
@@ -124,15 +108,14 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
         case 'plot-options':
           if (newValue) {
             this['plotOptions'] = JSON.parse(newValue);
+            this['plotOptions'].gl = this.gl;
           }
           break;
         default:
           break;
       }
 
-      this['plotOptions'].gl = this.gl;
-      this.fitCanvas();
-      this.drawPlot();
+      skate.emit(this, `gl-plot-2d-attr-changed-done-${this['name']}`);
     }
   }
 
@@ -178,6 +161,7 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
 
       canvas {
         position: relative !important;
+        cursor: default;
       }
     `;
 
@@ -258,18 +242,6 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
     this.plot = createPlot(this['plotOptions']);
     this.spikes = createSpikes(this.plot);
 
-    this['traces'].forEach((trace: Trace) => {
-      if (trace.line) {
-        this.addLinePlot(trace.line);
-      }
-      else if (trace.scatter) {
-        this.addScatterPlot(trace.scatter);
-      }
-      else if (trace.scatterFancy) {
-        this.addScatterFancyPlot(trace.scatterFancy);
-      }
-    });
-
     skate.emit(this, `gl-plot-2d-init-plot-done-${this['name']}`);
   }
 
@@ -292,7 +264,7 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
 
         // Set the viewBox to contain the entire surrounding div.
         // TODO: Parameterize the viewBox.
-        this['plotOptions'].viewBox = [50, 1, boundingClientRect.width - 1, boundingClientRect.height - 1];
+        this['plotOptions'].viewBox = [45, 1, boundingClientRect.width - 1, boundingClientRect.height - 1];
       }
     }
 

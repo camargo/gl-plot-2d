@@ -152,7 +152,6 @@ class App extends Component {
     const max = getMaxFromPoints([max3, max4]);
     const axes = getAxesTicks('linear', min, max, 1, false);
 
-
     // Options.
     this.plotOptions2 = {
       pixelRatio: 1,

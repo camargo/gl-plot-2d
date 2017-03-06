@@ -1,9 +1,9 @@
-// Type definitions for gl-plot2d.
-// Project: https://github.com/gl-vis/gl-plot2d
+// Type definitions for gl-vis.
+// Project: https://github.com/gl-vis
 // Definitions by: camargo <https://github.com/camargo>
 
-declare const glPlot2d: GLPlot2D;
-export = glPlot2d;
+declare const glVis;
+export = glVis;
 
 declare global {
   interface GLPlot2D {
@@ -72,6 +72,12 @@ declare global {
     setViewBox(nbox: number[]): void;
     update(options: any): void;
   }
+
+  interface GLLine2D {}
+
+  interface Scatter2D {}
+
+  interface GLScatterFancy {}
 
   interface Boxes {
     plot: GLPlot2D;

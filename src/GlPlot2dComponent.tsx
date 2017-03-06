@@ -102,6 +102,26 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
 
     if (this.gl && this.plot) {
       switch (name) {
+        case 'name':
+          if (newValue) {
+            this['name'] = newValue;
+          }
+          break;
+        case 'debug':
+          if (newValue) {
+            this['debug'] = JSON.parse(newValue);
+          }
+          break;
+        case 'height':
+          if (newValue) {
+            this['height'] = newValue;
+          }
+          break;
+        case 'width':
+          if (newValue) {
+            this['width'] = newValue;
+          }
+          break;
         case 'plot-options':
           if (newValue) {
             this['plotOptions'] = JSON.parse(newValue);
@@ -280,13 +300,13 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
       this.plot.update(this['plotOptions']);
 
       if (this['debug']) {
-        console.time('drawTime');
+        console.time(`draw-time-${this['name']}`);
       }
 
       this.plot.draw();
 
       if (this['debug']) {
-        console.timeEnd('drawTime');
+        console.timeEnd(`draw-time-${this['name']}`);
       }
 
       skate.emit(this, `gl-plot-2d-draw-plot-done-${this['name']}`);
@@ -300,33 +320,36 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
    * Helper that adds a line plot to the current plot.
    *
    * @param {Line} line
+   * @returns {GLLine2D}
    *
    * @memberOf GlPlot2dComponent
    */
-  public addLinePlot(line: Line): void {
-    createLine(this.plot, line);
+  public addLinePlot(line: Line): GLLine2D {
+    return createLine(this.plot, line);
   }
 
   /**
    * Helper that adds a scatter plot to the current plot.
    *
    * @param {Scatter} scatter
+   * @returns {Scatter2D}
    *
    * @memberOf GlPlot2dComponent
    */
-  public addScatterPlot(scatter: Scatter): void {
-    createScatter(this.plot, scatter);
+  public addScatterPlot(scatter: Scatter): Scatter2D {
+    return createScatter(this.plot, scatter);
   }
 
   /**
    * Helper that adds a scatter fancy plot to the current plot.
    *
    * @param {ScatterFancy} scatterFancy
+   * @returns {GLScatterFancy}
    *
    * @memberOf GlPlot2dComponent
    */
-  public addScatterFancyPlot(scatterFancy: ScatterFancy): void {
-    createScatterFancy(this.plot, scatterFancy);
+  public addScatterFancyPlot(scatterFancy: ScatterFancy): GLScatterFancy {
+    return createScatterFancy(this.plot, scatterFancy);
   }
 
   /**
@@ -337,7 +360,7 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
    *
    * @memberOf GlPlot2dComponent
    */
-  private onMouseDown(event: MouseEvent): void  {
+  private onMouseDown(event: MouseEvent): void {
     if (this.canvas && this.plot) {
       const canvasBoundingRect = this.canvas.getBoundingClientRect();
       const x = event.clientX - canvasBoundingRect.left;

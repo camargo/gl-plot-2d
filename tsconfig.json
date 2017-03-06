@@ -10,7 +10,7 @@
 			"./@types"
 		],
 		"types": [
-      "gl-plot2d",
+      "gl-vis",
 			"whatwg-customelements"
 		],
 		"jsx": "react",

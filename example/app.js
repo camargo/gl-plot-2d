@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { render } from 'react-dom';
 import { props } from 'skatejs';
+import { first, last } from 'lodash';
 
 import * as glPlot2d from 'gl-plot-2d';
 
@@ -12,12 +13,12 @@ class App extends Component {
 
   componentWillMount() {
     document.addEventListener('gl-plot-2d-init-plot-done-plot1', (event) => {
-      this.glPlot2dComponent1.addScatterFancyPlot(this.scatterFancy);
+      this.glPlot2dComponent1.addLinePlot(this.line1);
     });
 
     document.addEventListener('gl-plot-2d-init-plot-done-plot2', () => {
-      this.glPlot2dComponent2.addLinePlot(this.line);
-      this.glPlot2dComponent2.addScatterPlot(this.scatter);
+      this.glPlot2dComponent2.addLinePlot(this.line2);
+      this.glPlot2dComponent2.addScatterPlot(this.scatter1);
     });
   }
 
@@ -34,52 +35,31 @@ class App extends Component {
     this.height1 = '200px';
     this.width1 = '100%';
 
-    // Scatter Fancy.
-    this.scatterFancy = {
-      positions: [
-        .5,.5, 1.5,.5, 2.5,.5, 3.5,.5, 4.5,.5, 5.5,.5, 6.5,.5, 7.5,.5, 8.5,.5, 9.5,.5,
-        .5,1.5, 1.5,1.5, 2.5,1.5, .5,2.5, 1.5,2.5, 2.5,2.5, .5,3.5, 1.5,3.5, 2.5,3.5,
-        3.5,3.5, 4.5,3.5, 5.5,3.5
-      ],
-      sizes: [
-        40, 20, 30, 40, 50, 60, 70, 80, 90, 100,
-        25, 30, 35, 40, 45, 50, 1, 5, 20, 50, 120, 150
-      ],
-      colors: [
-        1,0,0,1, .1,0,0,1, .2,0,0,1, .3,0,0,1, .4,0,0,1, .5,0,0,1, .6,0,0,1, .7,0,0,1, .8,0,0,1, .9,0,0,1,
-        1,0,0,1, 0,1,0,1, 0,0,1,1, 0,0,0,.2, 0,0,0,.5, 0,0,0,.8, 0,0,1,1, 0,0,1,1, 0,0,1,1, 0,0,1,1, 0,0,1,1,
-        0,0,1,1
-      ],
-      glyphs: [
-        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-        '•', '+', '#', 'E', '=', 'mc²', '●', '●', '●', '●', '●', '●'
-      ],
-      borderWidths: [
-        1,1,1,1,1,1,1,1,1,1,
-        2,2,2, 0,0,0, .5, .5, .5, .5, .5, .5
-      ],
-      borderColors: [
-        0,0,0,0, 0,0,1,.9, 0,0,1,.8, 0,0,1,.7, 0,0,1,.6, 0,0,1,.5, 0,0,1,.4, 0,0,1,.3, 0,0,1,.2, 0,0,1,.1,
-        0,1,0,1, 0,0,1,1, 1,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,1,
-        0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,1
-      ],
-      selected: [
-        false, false, false, false, false, false, false, false, false, false,
-        false, false, false, false, false, false, false, false, false, false,
-        false, false
-      ]
+    // Line.
+    const p1Positions = glPlot2d.makeRandomPositions(1000, 10);
+    const min = glPlot2d.getMinFromPositions(p1Positions);
+    const max = glPlot2d.getMaxFromPositions(p1Positions);
+    this.line1 = {
+      positions: p1Positions,
+      color: [0, 1, 0, 1],
+      fill: [false, true, false, false],
+      fillColor: [[0, 0, 1, 0.5], [0, 0, 1, 0.5], [0, 0, 1, 0.5], [0, 0, 1, 0.5]],
+      width: 1
     };
 
     // Ticks.
-    const min = glPlot2d.getMinFromPositions(this.scatterFancy.positions);
-    const max = glPlot2d.getMaxFromPositions(this.scatterFancy.positions);
     const tickList = glPlot2d.getTicks({ p1: min, p2: max }, 'linear', 1, true);
 
     // Options.
     this.plotOptions1 = {
       pixelRatio: 1,
       screenBox: null,
-      dataBox: [tickList.t1[0].x - 0.25, tickList.t2[0].x - 0.5, tickList.t1[tickList.t1.length - 1].x + 0.25, tickList.t2[tickList.t2.length - 1].x + 0.5],
+      dataBox: [
+        first(tickList.t1).x,
+        first(tickList.t2).x - 0.5,
+        last(tickList.t1).x,
+        last(tickList.t2).x + 0.5
+      ],
       viewBox: null,
       titleEnabe: false,
       title: '',
@@ -133,13 +113,13 @@ class App extends Component {
     this.width2 = '100%';
 
     // Line.
-    const p3Positions = glPlot2d.makeRandomPositions(100, 20);
+    const p3Positions = glPlot2d.makeRandomPositions(1000, 20);
     const min3 = glPlot2d.getMinFromPositions(p3Positions);
-    const max3 = glPlot2d.getMinFromPositions(p3Positions);
-    this.line = {
+    const max3 = glPlot2d.getMaxFromPositions(p3Positions);
+    this.line2 = {
       positions: p3Positions,
       color: [0, 0, 1, 1],
-      fill: [false, false, false, false],
+      fill: [false, true, false, false],
       fillColor: [[0, 1, 0, 0.5], [0, 1, 0, 0.5], [0, 1, 0, 0.5], [0, 1, 0, 0.5]],
       width: 2
     };
@@ -148,7 +128,7 @@ class App extends Component {
     const p4Positions = glPlot2d.makeRandomPositions(100, 20);
     const min4 = glPlot2d.getMinFromPositions(p4Positions);
     const max4 = glPlot2d.getMaxFromPositions(p4Positions);
-    this.scatter = {
+    this.scatter1 = {
       positions: p4Positions,
       size: 10,
       color: [0.8, 0.0, 0.0, 1],
@@ -159,13 +139,18 @@ class App extends Component {
     // Ticks.
     const min = glPlot2d.getMinFromPoints([min3, min4]);
     const max = glPlot2d.getMaxFromPoints([max3, max4]);
-    const tickList = glPlot2d.getTicks({ p1: min, p2: max }, 'linear', 1, true);
+    const tickList = glPlot2d.getTicks({ p1: min, p2: max }, 'linear', 1, false);
 
     // Options.
     this.plotOptions2 = {
       pixelRatio: 1,
       screenBox: null,
-      dataBox: [tickList.t1[0].x - 0.25, tickList.t2[0].x - 0.5, tickList.t1[tickList.t1.length - 1].x + 0.25, tickList.t2[tickList.t2.length - 1].x + 0.5],
+      dataBox: [
+        first(tickList.t1).x,
+        first(tickList.t2).x - 0.5,
+        last(tickList.t1).x,
+        last(tickList.t2).x + 0.5
+      ],
       viewBox: null,
       titleEnabe: false,
       title: '',

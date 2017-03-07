@@ -11,9 +11,9 @@ import { debounce } from 'lodash';
 import {
   GlPlot2dComponentProps,
   GlPlot2dOptions,
-  Line,
-  Scatter,
-  ScatterFancy
+  LineOptions,
+  ScatterOptions,
+  ScatterFancyOptions
 } from './';
 
 /**
@@ -321,37 +321,37 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
   /**
    * Helper that adds a line plot to the current plot.
    *
-   * @param {Line} line
+   * @param {LineOptions} lineOptions
    * @returns {GLLine2D}
    *
    * @memberOf GlPlot2dComponent
    */
-  public addLinePlot(line: Line): GLLine2D {
-    return createLine(this.plot, line);
+  public addLinePlot(lineOptions: LineOptions): GLLine2D {
+    return createLine(this.plot, lineOptions);
   }
 
   /**
    * Helper that adds a scatter plot to the current plot.
    *
-   * @param {Scatter} scatter
+   * @param {ScatterOptions} scatter
    * @returns {Scatter2D}
    *
    * @memberOf GlPlot2dComponent
    */
-  public addScatterPlot(scatter: Scatter): Scatter2D {
-    return createScatter(this.plot, scatter);
+  public addScatterPlot(scatterOptions: ScatterOptions): Scatter2D {
+    return createScatter(this.plot, scatterOptions);
   }
 
   /**
    * Helper that adds a scatter fancy plot to the current plot.
    *
-   * @param {ScatterFancy} scatterFancy
+   * @param {ScatterFancyOptions} scatterFancyOptions
    * @returns {GLScatterFancy}
    *
    * @memberOf GlPlot2dComponent
    */
-  public addScatterFancyPlot(scatterFancy: ScatterFancy): GLScatterFancy {
-    return createScatterFancy(this.plot, scatterFancy);
+  public addScatterFancyPlot(scatterFancyOptions: ScatterFancyOptions): GLScatterFancy {
+    return createScatterFancy(this.plot, scatterFancyOptions);
   }
 
   /**

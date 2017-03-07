@@ -14,9 +14,9 @@ export {
   getMinFromPositions,
   getMaxFromPositions,
   makeRandomPositions,
-  Line,
+  LineOptions,
   Point,
-  Scatter,
-  ScatterFancy,
+  ScatterOptions,
+  ScatterFancyOptions,
   Tick
 } from './src';

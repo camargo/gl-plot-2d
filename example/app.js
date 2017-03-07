@@ -20,7 +20,7 @@ class App extends Component {
   }
 
   componentWillMount() {
-    document.addEventListener('gl-plot-2d-init-plot-done-plot1', (event) => {
+    document.addEventListener('gl-plot-2d-init-plot-done-plot1', () => {
       this.glPlot2dComponent1.addLinePlot(this.line1);
       this.glPlot2dComponent1.drawPlot();
     });

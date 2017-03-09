@@ -2,7 +2,7 @@
 
 This is a Web Component that wraps [gl-plot2d](https://github.com/gl-vis/gl-plot2d).
 
-![Stacked Graphs](http://i.imgur.com/YpSzWKL.png)
+![Line Plot](http://i.imgur.com/WMq7o80.png)
 
 ## Installation
 
@@ -12,7 +12,7 @@ npm install gl-plot-2d --save
 
 ## Example
 
-- `<gl-plot-2d> in React` - [Code](https://github.com/camargo/gl-plot-2d/tree/master/example)
+- `<gl-plot-2d> in React` - [Code](https://github.com/camargo/gl-plot-2d/tree/master/example), [Live Example](https://camargo.github.io/gl-plot-2d/example/dist)
 
 ## Build & Run Example
 

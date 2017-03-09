@@ -26,6 +26,7 @@
     "tslib": "1.6.0",
     "tslint": "4.5.1",
     "typescript": "2.2.1",
+    "uglifyjs-webpack-plugin": "0.3.0",
     "webpack": "2.2.1"
   },
   "browserify": {

@@ -1,3 +1,4 @@
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
   entry: __dirname + '/index.ts',
@@ -19,6 +20,10 @@ module.exports = {
     library: 'glPlot2d',
     libraryTarget: 'umd'
   },
+
+  plugins: [
+    new UglifyJSPlugin()
+  ],
 
   performance: {
     hints: false

@@ -179,7 +179,7 @@ export function getMaxFromPositions(positions: number[]): Point {
 
 /**
  * Gets ticks by type for x and y Axes.
- * Supported types are linear, log, and pow.
+ * Supported types are linear and log.
  *
  * @export
  * @param {string} type

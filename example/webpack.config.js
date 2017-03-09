@@ -3,11 +3,13 @@ module.exports = {
   entry: {
     app: './app.js'
   },
+
   output: {
     path: __dirname,
     filename: '[name].js',
     chunkFilename: '[id].js'
   },
+
   module: {
     loaders: [
       { test: /\.(js|jsx)$/,

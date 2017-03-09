@@ -1,0 +1,11 @@
+example
+node_modules
+src
+.editorconfig
+.gitignore
+build.sh
+clean.sh
+index.ts
+tsconfig.json
+tslint.json
+webpack.config.js

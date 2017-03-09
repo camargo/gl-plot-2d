@@ -113,6 +113,7 @@ class App extends Component {
       debug: this.debug1,
       height: this.height1,
       width: this.width1,
+      fitViewBox: true,
       plotOptions: this.plotOptions1
     });
   }
@@ -183,13 +184,13 @@ class App extends Component {
       labelFont: ["sans-serif", "sans-serif"],
       labelColor: [[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
       ticks: [axes.x, axes.y],
-      tickEnable: [false, true, false, false],
-      tickPad: [20, 20, 0, 0],
+      tickEnable: [true, true, false, false],
+      tickPad: [15, 20, 0, 0],
       tickAngle: [0, 0, 0, 0],
       tickColor: [[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
       tickMarkWidth: [1, 1, 1, 1],
       tickMarkLength: [4, 4, 4, 4],
-      tickMarkColor: [[0, 0, 0, 0], [0, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
+      tickMarkColor: [[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
       gridLineEnable: [false, true],
       gridLineColor: [[0, 0, 0, 0.5], [0, 0, 0, 0.5]],
       gridLineWidth: [0.5, 0.5],
@@ -204,6 +205,7 @@ class App extends Component {
       debug: this.debug2,
       height: this.height2,
       width: this.width2,
+      fitViewBox: true,
       plotOptions: this.plotOptions2
     });
   }

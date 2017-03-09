@@ -43,6 +43,7 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
       debug: skate.prop.boolean({ attribute: true }),
       height: skate.prop.string({ attribute: true }),
       width: skate.prop.string({ attribute: true }),
+      fitViewBox: skate.prop.boolean({ attribute: true }),
       plotOptions: skate.prop.object<GlPlot2dComponent, GlPlot2dOptions>({ attribute: true })
     };
   }
@@ -122,6 +123,11 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
         case 'width':
           if (newValue) {
             this['width'] = newValue;
+          }
+          break;
+        case 'fitViewBox':
+          if (newValue) {
+            this['fitViewBox'] = newValue;
           }
           break;
         case 'plot-options':
@@ -234,18 +240,6 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
       this.canvas.onmousedown = (event: MouseEvent) => {
         this.onMouseDown(event);
       };
-
-      this.canvas.onmouseup = () => {
-        // TODO.
-      };
-
-      this.canvas.onmousemove = () => {
-        // TODO.
-      };
-
-      this.canvas.onmouseover = () => {
-        // TODO.
-      };
     }
   }
 
@@ -281,9 +275,10 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
       if (div) {
         const boundingClientRect = div.getBoundingClientRect();
 
-        // Set the viewBox to contain the entire surrounding div.
-        // TODO: Parameterize the viewBox.
-        this['plotOptions'].viewBox = [45, 1, boundingClientRect.width - 1, boundingClientRect.height - 1];
+        // Set the viewBox to contain the entire surrounding div if fitViewBox is true.
+        if (this['fitViewBox']) {
+          this['plotOptions'].viewBox = [45, 1, boundingClientRect.width - 1, boundingClientRect.height - 1];
+        }
       }
     }
 

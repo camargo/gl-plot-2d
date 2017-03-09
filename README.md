@@ -2,9 +2,19 @@
 
 This is a Web Component that wraps [gl-plot2d](https://github.com/gl-vis/gl-plot2d).
 
-![Line Graph](http://i.imgur.com/WMq7o80.png)
+![Stacked Graphs](http://i.imgur.com/YpSzWKL.png)
 
-## Build & Run
+## Installation
+
+```
+npm install gl-plot-2d --save
+```
+
+## Example
+
+- `<gl-plot-2d> in React` - [Code](https://github.com/camargo/gl-plot-2d/tree/master/example)
+
+## Build & Run Example
 
 ```
 npm install

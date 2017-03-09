@@ -12,7 +12,7 @@ npm install gl-plot-2d --save
 
 ## Example
 
-- `<gl-plot-2d> in React` - [Code](https://github.com/camargo/gl-plot-2d/tree/master/example), [Live Example](https://camargo.github.io/gl-plot-2d/example/dist)
+- `<gl-plot-2d> in React` - [Demo](https://camargo.github.io/gl-plot-2d/example/dist) / [Code](https://github.com/camargo/gl-plot-2d/tree/master/example)
 
 ## Build & Run Example
 

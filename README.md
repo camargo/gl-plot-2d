@@ -4,7 +4,7 @@ This is a Web Component that wraps [gl-plot2d](https://github.com/gl-vis/gl-plot
 
 ![Line Plot](http://i.imgur.com/WMq7o80.png)
 
-## Installation
+## Installation ([npm](https://www.npmjs.com/package/gl-plot-2d))
 
 ```
 npm install gl-plot-2d --save

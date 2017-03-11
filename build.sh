@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ ! -d "node_modules" ]; then
+  npm cache clean
+  npm install
+fi
+
 rm index.js
 npm run build:dev
 

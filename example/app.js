@@ -45,6 +45,7 @@ class App extends Component {
     this.debug1 = true;
     this.height1 = '200px';
     this.width1 = '100%';
+    this.canvasTop = '10px';
 
     // Line.
     const p1Positions = makeRandomPositions(1000, 20);
@@ -113,6 +114,7 @@ class App extends Component {
       debug: this.debug1,
       height: this.height1,
       width: this.width1,
+      canvasTop: this.canvasTop,
       fitViewBox: true,
       plotOptions: this.plotOptions1
     });
@@ -123,6 +125,7 @@ class App extends Component {
     this.debug2 = true;
     this.height2 = '200px';
     this.width2 = '100%';
+    this.canvasTop = '215px';
 
     // Line.
     const p3Positions = makeRandomPositions(1000, 20);
@@ -205,6 +208,7 @@ class App extends Component {
       debug: this.debug2,
       height: this.height2,
       width: this.width2,
+      canvasTop: this.canvasTop,
       fitViewBox: true,
       plotOptions: this.plotOptions2
     });
@@ -215,18 +219,11 @@ class App extends Component {
       width: '100%'
     };
 
-    const innerContainer = {
-      paddingBottom: '0.5px'
-    };
-
     return (
       <div style={outerContainer}>
-        <div style={innerContainer}>
-          <gl-plot-2d ref={(glPlot2dComponent1) => { this.glPlot2dComponent1 = glPlot2dComponent1 }}/>
-        </div>
-        <div style={innerContainer}>
-          <gl-plot-2d ref={(glPlot2dComponent2) => { this.glPlot2dComponent2 = glPlot2dComponent2 }} />
-        </div>
+        <gl-plot-2d ref={(glPlot2dComponent1) => { this.glPlot2dComponent1 = glPlot2dComponent1 }}/>
+
+        <gl-plot-2d ref={(glPlot2dComponent2) => { this.glPlot2dComponent2 = glPlot2dComponent2 }} />
       </div>
     );
   }

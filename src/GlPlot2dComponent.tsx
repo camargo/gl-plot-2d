@@ -43,6 +43,7 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
       debug: skate.prop.boolean({ attribute: true }),
       height: skate.prop.string({ attribute: true }),
       width: skate.prop.string({ attribute: true }),
+      canvasTop: skate.prop.string({ attribute: true }),
       fitViewBox: skate.prop.boolean({ attribute: true }),
       plotOptions: skate.prop.object<GlPlot2dComponent, GlPlot2dOptions>({ attribute: true })
     };
@@ -125,6 +126,11 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
             this['width'] = newValue;
           }
           break;
+        case 'canvasTop':
+          if (newValue) {
+            this['canvasTop'] = newValue;
+          }
+          break;
         case 'fitViewBox':
           if (newValue) {
             this['fitViewBox'] = newValue;
@@ -185,8 +191,7 @@ export class GlPlot2dComponent extends skate.Component<GlPlot2dComponentProps> {
       }
 
       canvas {
-        position: relative !important;
-        cursor: default;
+        top: ${this['canvasTop']} !important
       }
     `;
 

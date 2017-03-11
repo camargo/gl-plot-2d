@@ -13,6 +13,7 @@ export interface GlPlot2dComponentProps {
   debug: boolean;
   height: string;
   width: string;
+  canvasTop: string;
   fitViewBox: boolean;
   plotOptions: GlPlot2dOptions; // Specific to gl-plot2d.
 }

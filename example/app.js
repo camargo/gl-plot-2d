@@ -215,12 +215,12 @@ class App extends Component {
   }
 
   render() {
-    const outerContainer = {
+    const container = {
       width: '100%'
     };
 
     return (
-      <div style={outerContainer}>
+      <div style={container}>
         <gl-plot-2d ref={(glPlot2dComponent1) => { this.glPlot2dComponent1 = glPlot2dComponent1 }}/>
 
         <gl-plot-2d ref={(glPlot2dComponent2) => { this.glPlot2dComponent2 = glPlot2dComponent2 }} />

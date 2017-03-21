@@ -44517,13 +44517,13 @@ var App = function (_Component) {
     value: function render() {
       var _this3 = this;
 
-      var outerContainer = {
+      var container = {
         width: '100%'
       };
 
       return _react2.default.createElement(
         'div',
-        { style: outerContainer },
+        { style: container },
         _react2.default.createElement('gl-plot-2d', { ref: function ref(glPlot2dComponent1) {
             _this3.glPlot2dComponent1 = glPlot2dComponent1;
           } }),
